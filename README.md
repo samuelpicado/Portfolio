@@ -1,4 +1,4 @@
-# Programming IV Lab 1 — Personal Portfolio
+# Personal Portfolio
 
 ## Overview
 
