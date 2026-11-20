@@ -138,7 +138,7 @@
 
 .lab-controls input[type='range'] {
   --lab-slider-track: linear-gradient(to right, var(--lab-accent) var(--lab-noise, 42%),
-    var(--lab-rule) var(--lab-noise, 42%));
+    #7a866f var(--lab-noise, 42%));
   --lab-slider-thumb: linear-gradient(90deg, transparent 35%, #82974b 35% 43%,
     transparent 43% 57%, #82974b 57% 65%, transparent 65%), var(--lab-accent);
 
@@ -235,6 +235,12 @@
   .lab-plot-point,
   .lab-plot-legend circle {
     r: 5px;
+  }
+}
+
+@container (max-width: 350px) {
+  .lab-chart svg {
+    font-size: 27px;
   }
 }
 
