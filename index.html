@@ -1,320 +1,187 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Samuel Picado · Estudiante de Ingeniería en Sistemas</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#191d15">
+  <meta name="description" content="Portfolio de Samuel Picado, estudiante de Ingeniería en Sistemas. Proyectos académicos y experimentos de machine learning y datos.">
+  <title>Samuel Picado · Ingeniería en Sistemas &amp; Machine Learning</title>
+  <link rel="icon" href="assets/mark.png" type="image/png">
+  <link rel="preload" href="assets/bricolage.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="lab.css">
+  <script defer src="lab.js"></script>
+  <script type="module" src="portfolio.js"></script>
 </head>
 <body>
+  <a class="skip-link" href="#inicio">Saltar al contenido</a>
 
-  <header class="navbar">
-    <div class="container navbar__inner">
-      <a href="#inicio" class="navbar__brand">
-        <span class="navbar__logo">SP</span>
-        <span class="navbar__name">Samuel Picado</span>
+  <header class="site-header">
+    <div class="shell masthead">
+      <a href="#inicio" class="brand" aria-label="Samuel Picado, inicio">
+        <img src="assets/mark.png" width="32" height="32" alt="">
+        <span>Samuel Picado</span>
       </a>
-      <nav class="navbar__nav">
-        <a href="#perfil">Perfil</a>
-        <a href="#habilidades">Habilidades</a>
+      <nav aria-label="Navegación principal">
         <a href="#proyectos">Proyectos</a>
-        <a href="#contacto">Contacto</a>
+        <a href="#laboratorio">Laboratorio</a>
+        <a href="#perfil">Perfil</a>
       </nav>
-      <a href="#contacto" class="btn btn--primary navbar__cta">Contactar</a>
+      <a class="header-contact" href="#contacto">Contacto <span class="arrow-diagonal" aria-hidden="true"></span></a>
     </div>
   </header>
 
-  <section id="inicio" class="hero">
-    <div class="container hero__inner">
-      <div class="hero__content">
-        <span class="badge badge--available">
-          <span class="badge__dot"></span>
-          Disponible para trabajo remoto
-        </span>
-        <h1 class="hero__title">
-          Samuel<br />
-          <span class="text--accent">Picado</span>
-        </h1>
-        <p class="hero__subtitle">Estudiante de Ingeniería en Sistemas | Enfoque en AI y Machine Learning</p>
-        <p class="hero__description">
-          Estudiante de tercer año interesado en inteligencia artificial y machine learning.
-          Actualmente aprendiendo a construir modelos de datos y a trabajar con la nube.
-        </p>
-        <div class="hero__actions">
-          <a href="#proyectos" class="btn btn--primary">Ver proyectos</a>
-          <a href="#contacto" class="btn btn--outline">Contacto</a>
+  <main id="inicio" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="shell hero-grid">
+        <figure class="hero-art">
+          <img src="assets/relieve.webp" width="1280" height="853" alt="" fetchpriority="high">
+          <figcaption>Relieve de datos <span aria-hidden="true"></span></figcaption>
+        </figure>
+        <div class="hero-copy">
+          <p class="eyebrow hero-kicker"><span></span> Cuaderno de campo</p>
+          <h1 id="hero-title"><span class="hero-line">Samuel</span> <span class="hero-line">Picado<span class="hero-period">.</span></span></h1>
+          <p class="hero-intro">Estudio Ingeniería en Sistemas. Exploro cómo usar datos y machine learning para resolver problemas concretos.</p>
+          <div class="hero-actions">
+            <a class="button button-accent" href="#proyectos">Ver proyectos <span aria-hidden="true">↓</span></a>
+            <a class="hero-lab-link" href="#laboratorio">Probar el laboratorio <span class="arrow-diagonal" aria-hidden="true"></span></a>
+          </div>
+        </div>
+        <div class="hero-end">
+          <p><span class="availability-dot"></span> Abierto a prácticas y proyectos remotos</p>
+          <span>Datos / Machine learning</span>
         </div>
       </div>
-      <div class="hero__visual">
-        <div class="hero__image-wrapper">
-          <img class="hero__image" src="https://images.unsplash.com/photo-1770520215459-3dd0b7140844?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxBSSUyMG1hY2hpbmUlMjBsZWFybmluZyUyMG5ldXJhbCUyMG5ldHdvcmslMjBhYnN0cmFjdCUyMGJsdWV8ZW58MXx8fHwxNzcyNTAyMTgwfDA&ixlib=rb-4.1.0&q=80&w=1080" alt="AI Neural Network Abstract" />
-          <div class="hero__image-overlay">
-            <span class="hero__image-tag">SYSTEMS ENGINEER</span>
-            <span class="hero__image-sub">Machine Learning · Data Engineering</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="perfil" class="section perfil">
-    <div class="container">
-      <p class="section__eyebrow">SOBRE MI</p>
-      <h2 class="section__title">Perfil</h2>
-      <div class="perfil__grid">
-        <div class="perfil__text">
-          <p>
-            Soy estudiante de tercer año de Ingeniería en Sistemas con interés en
-            <a href="#habilidades" class="link--accent">Inteligencia Artificial</a> y
-            <a href="#habilidades" class="link--accent">Machine Learning</a>.
-            Me gusta aprender sobre datos y cómo usarlos para resolver problemas reales.
-          </p>
-          <p>
-            He trabajado en algunos proyectos académicos donde apliqué Python y las
-            librerías del área. Busco oportunidades donde pueda seguir aprendiendo
-            mientras contribuyo con lo que sé.
-          </p>
-        </div>
-        <div class="perfil__cards">
-          <div class="info-card">
-            <div>
-              <p class="info-card__label">FORMACION</p>
-              <p class="info-card__value">Ingeniería en Sistemas – 3er año</p>
-            </div>
-          </div>
-          <div class="info-card">
-            <div>
-              <p class="info-card__label">ESPECIALIZACION</p>
-              <p class="info-card__value">AI y Machine Learning</p>
-            </div>
-          </div>
-          <div class="info-card">
-            <div>
-              <p class="info-card__label">UBICACION</p>
-              <p class="info-card__value">Latinoamerica · UTC-5</p>
-            </div>
-          </div>
-          <div class="info-card">
-            <div>
-              <p class="info-card__label">OBJETIVO</p>
-              <p class="info-card__value">Practicas o trabajo remoto en AI / Data</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="habilidades" class="section habilidades">
-    <div class="container">
-      <p class="section__eyebrow">COMPETENCIAS</p>
-      <h2 class="section__title">Habilidades</h2>
-      <div class="habilidades__grid">
-
-        <div class="skills-column">
-          <h3 class="skills-column__title">Hard Skills</h3>
-          <div class="skill-card">
-            <span class="skill-card__name">Python</span>
-            <span class="badge badge--cyan">Intermedio</span>
-          </div>
-          <div class="skill-card">
-            <span class="skill-card__name">Machine Learning</span>
-            <span class="badge badge--orange">Fundamentos</span>
-          </div>
-          <div class="skill-card">
-            <span class="skill-card__name">SQL</span>
-            <span class="badge badge--cyan">Intermedio</span>
-          </div>
-          <div class="skill-card">
-            <span class="skill-card__name">AWS</span>
-            <span class="badge badge--yellow">Basico</span>
-          </div>
-          <div class="skill-card">
-            <span class="skill-card__name">Git</span>
-            <span class="badge badge--cyan">Intermedio</span>
-          </div>
-          <div class="skill-card">
-            <span class="skill-card__name">HTML y CSS</span>
-            <span class="badge badge--green">Avanzado</span>
+    <section class="section work" id="proyectos" aria-labelledby="work-title">
+      <div class="shell">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Trabajo académico</p>
+            <h2 id="work-title">Proyectos seleccionados<span class="ink-period">.</span></h2>
           </div>
         </div>
 
-        <div class="skills-column">
-          <h3 class="skills-column__title">Herramientas</h3>
-          <div class="tools-section">
-            <div class="tools-section__tags">
-              <span class="tag">Python</span>
-              <span class="tag">scikit-learn</span>
-              <span class="tag">Pandas</span>
-              <span class="tag">NumPy</span>
-              <span class="tag">Matplotlib</span>
-              <span class="tag">SQL</span>
-              <span class="tag">AWS S3</span>
-              <span class="tag">Git</span>
-              <span class="tag">GitHub</span>
-              <span class="tag">Jupyter</span>
+        <div class="projects">
+          <article class="project">
+            <img class="project-image" src="assets/vivienda.webp" width="1280" height="720" alt="Ilustración isométrica de viviendas y puntos de datos sobre un plano." loading="lazy" decoding="async">
+            <div class="project-body">
+              <p class="eyebrow project-type">Regresión lineal</p>
+              <h3>Predicción de precios de vivienda</h3>
+              <p>Estimación del precio de una vivienda según su ubicación, tamaño y número de habitaciones.</p>
+              <details class="project-details">
+                <summary><span>Ver caso</span><span class="project-toggle" aria-hidden="true"></span></summary>
+                <div class="case-content">
+                  <p>Preparé los datos para ajustar un modelo de regresión lineal múltiple en Python. Usé validación cruzada para evaluar el modelo en distintas particiones de los datos.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>Python</li><li>scikit-learn</li><li>Pandas</li><li>Matplotlib</li></ul>
+                </div>
+              </details>
             </div>
+          </article>
+
+          <article class="project">
+            <img class="project-image" src="assets/cifar.webp" width="1280" height="720" alt="Ilustración de una cuadrícula de imágenes atravesada por un filtro de convolución." loading="lazy" decoding="async">
+            <div class="project-body">
+              <p class="eyebrow project-type">Red neuronal convolucional</p>
+              <h3>Clasificación de imágenes con CIFAR-10</h3>
+              <p>Una red neuronal entrenada para reconocer diez categorías de imágenes.</p>
+              <details class="project-details">
+                <summary><span>Ver caso</span><span class="project-toggle" aria-hidden="true"></span></summary>
+                <div class="case-content">
+                  <p>Entrené la red con TensorFlow y Keras. Usé aumentación de datos para exponer al modelo a variaciones de sus imágenes de entrenamiento.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>Python</li><li>TensorFlow</li><li>Keras</li><li>Jupyter</li></ul>
+                </div>
+              </details>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section lab" id="laboratorio" aria-labelledby="lab-title">
+      <div class="shell">
+        <div class="section-head lab-head">
+          <div>
+            <p class="eyebrow">Laboratorio interactivo</p>
+            <h2 id="lab-title">¿Cuánto ruido tolera una recta?</h2>
           </div>
+          <p>Mueve el control para dispersar los puntos y observa cómo cambia el ajuste de la regresión lineal.</p>
         </div>
 
-      </div>
-    </div>
-  </section>
-
-  <section id="proyectos" class="section proyectos">
-    <div class="container">
-      <div class="proyectos__header">
-        <h2 class="section__title section__title--no-eyebrow">Proyectos Academicos</h2>
-      </div>
-      <div class="proyectos__grid">
-
-        <article class="project-card">
-          <div class="project-card__header">
-            <div class="project-card__icon-wrap project-card__icon-wrap--blue">
-              <span class="project-card__icon project-card__icon--text">ML</span>
+        <div class="lab-grid" id="lab-interactive" hidden>
+          <figure class="lab-chart">
+            <figcaption>Regresión lineal <span>Datos sintéticos</span></figcaption>
+            <svg id="lab-plot" role="img" viewBox="0 0 620 320" preserveAspectRatio="xMidYMid meet" aria-label="Diagrama de dispersión y recta de regresión"></svg>
+          </figure>
+          <div class="lab-console">
+            <div class="lab-controls">
+              <label for="lab-noise">Ruido de los datos</label>
+              <output for="lab-noise" id="lab-noise-value" aria-live="off">42%</output>
+              <input id="lab-noise" type="range" min="0" max="100" value="42">
             </div>
-            <div>
-              <p class="project-card__category">MACHINE LEARNING</p>
-              <h3 class="project-card__title">Prediccion de Precios de Vivienda</h3>
-            </div>
-          </div>
-          <p class="project-card__desc">
-            Modelo de regresion lineal multiple en Python para predecir precios de viviendas
-            segun variables como ubicacion, tamano y numero de habitaciones.
-            Se aplico preprocesamiento y validacion cruzada.
-          </p>
-          <div class="project-card__tech">
-            <p class="project-card__tech-label">TECNOLOGIAS</p>
-            <div class="project-card__tags">
-              <span class="tag">Python</span>
-              <span class="tag">scikit-learn</span>
-              <span class="tag">Pandas</span>
-              <span class="tag">Matplotlib</span>
-            </div>
-          </div>
-          <a href="#" class="btn btn--ghost project-card__btn">Ver mas</a>
-        </article>
-
-        <article class="project-card">
-          <div class="project-card__header">
-            <div class="project-card__icon-wrap project-card__icon-wrap--purple">
-              <span class="project-card__icon project-card__icon--text">CNN</span>
-            </div>
-            <div>
-              <p class="project-card__category">DEEP LEARNING</p>
-              <h3 class="project-card__title">Clasificacion de Imagenes con Red Neuronal</h3>
-            </div>
-          </div>
-          <p class="project-card__desc">
-            Red neuronal convolucional para clasificar imagenes del dataset CIFAR-10
-            en 10 categorias. Entrenada con TensorFlow y Keras usando data augmentation.
-          </p>
-          <div class="project-card__tech">
-            <p class="project-card__tech-label">TECNOLOGIAS</p>
-            <div class="project-card__tags">
-              <span class="tag">Python</span>
-              <span class="tag">TensorFlow</span>
-              <span class="tag">Keras</span>
-              <span class="tag">Jupyter</span>
-            </div>
-          </div>
-          <a href="#" class="btn btn--ghost project-card__btn">Ver mas</a>
-        </article>
-
-      </div>
-    </div>
-  </section>
-
-  <section id="contacto" class="section contacto">
-    <div class="container">
-      <p class="section__eyebrow section__eyebrow--center">CONTACTO</p>
-      <h2 class="section__title section__title--center">Hablemos</h2>
-      <p class="section__subtitle">Si tienes un proyecto o una propuesta, no dudes en contactarme.</p>
-
-      <div class="contacto__grid">
-
-        <div class="contact-form-wrap">
-          <h3 class="contact-form-wrap__title">Enviame un mensaje</h3>
-          <form class="contact-form" action="#" method="post">
-            <div class="form-group">
-              <label class="form-label" for="nombre">NOMBRE</label>
-              <input class="form-input" type="text" id="nombre" name="nombre" placeholder="Tu nombre" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="email">CORREO</label>
-              <input class="form-input" type="email" id="email" name="email" placeholder="tu@email.com" />
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="mensaje">MENSAJE</label>
-              <textarea class="form-input form-textarea" id="mensaje" name="mensaje" placeholder="Cuentame sobre tu proyecto..."></textarea>
-            </div>
-            <button type="submit" class="btn btn--primary btn--full">Enviar</button>
-          </form>
-        </div>
-
-        <div class="contact-info">
-          <h3 class="contact-info__title">Informacion de contacto</h3>
-          <div class="contact-item">
-            <div class="contact-item__icon-wrap contact-item__icon-wrap--dark">
-              <span class="contact-item__icon-text">@</span>
-            </div>
-            <div>
-              <p class="contact-item__label">CORREO</p>
-              <a href="mailto:samipikdo@gmail.com" class="contact-item__value link--accent">samipikdo@gmail.com</a>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-item__icon-wrap contact-item__icon-wrap--dark">
-              <span class="contact-item__icon-text">in</span>
-            </div>
-            <div>
-              <p class="contact-item__label">LINKEDIN</p>
-              <a href="https://www.linkedin.com/in/samuel-picado-8082373b4" target="_blank" rel="noopener noreferrer" class="contact-item__value link--accent">linkedin.com/in/samuel-picado</a>
-            </div>
-          </div>
-          <div class="contact-item">
-            <div class="contact-item__icon-wrap contact-item__icon-wrap--dark">
-              <span class="contact-item__icon-text">gh</span>
-            </div>
-            <div>
-              <p class="contact-item__label">GITHUB</p>
-              <a href="https://github.com/samuelpicado" target="_blank" rel="noopener noreferrer" class="contact-item__value">github.com/samuelpicado</a>
-            </div>
-          </div>
-          <div class="availability-card">
-            <p class="availability-card__status">
-              <span class="badge__dot badge__dot--green"></span>
-              Disponible ahora
-            </p>
-            <p class="availability-card__text">
-              Estoy abierto a practicas o proyectos en el area de
-              <a href="#habilidades" class="link--accent">AI</a> y
-              <a href="#habilidades" class="link--accent">Machine Learning</a>.
-            </p>
+            <dl class="lab-metrics">
+              <div>
+                <dt>Coeficiente R²</dt>
+                <dd id="lab-r2">—</dd>
+              </div>
+              <div>
+                <dt>Error medio absoluto</dt>
+                <dd id="lab-mae">—</dd>
+              </div>
+            </dl>
+            <p id="lab-update" class="visually-hidden" role="status"></p>
           </div>
         </div>
-
+        <noscript><p>Habilita JavaScript para ajustar el ruido de los datos y ver cómo cambia la regresión.</p></noscript>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer class="footer">
-    <div class="container footer__inner">
-      <div class="footer__brand">
-        <span class="navbar__logo">SP</span>
-        <p>Samuel Picado © 2025 · Estudiante de Ingeniería en Sistemas</p>
+    <section class="section profile" id="perfil" aria-labelledby="profile-title">
+      <div class="shell profile-grid">
+        <div class="profile-copy">
+          <p class="eyebrow">Sobre mí</p>
+          <h2 id="profile-title">Samuel Picado<span class="ink-period">.</span></h2>
+          <p>Soy estudiante de tercer año de Ingeniería en Sistemas. En mis proyectos académicos he trabajado con Python, datos y modelos de aprendizaje automático. Estoy aprendiendo a llevar ese trabajo a la nube.</p>
+          <p>Busco prácticas y proyectos remotos en los que pueda seguir aprendiendo y contribuir en machine learning o ingeniería de datos.</p>
+        </div>
+        <div id="habilidades" class="toolkit">
+          <h3 class="eyebrow">Habilidades</h3>
+          <dl>
+            <div><dt>Datos</dt><dd>Python, SQL, Pandas, NumPy</dd></div>
+            <div><dt>Machine learning</dt><dd>scikit-learn, TensorFlow, Keras</dd></div>
+            <div><dt>Exploración</dt><dd>Jupyter, Matplotlib</dd></div>
+            <div><dt>Desarrollo y nube</dt><dd>Git, GitHub, HTML, CSS, AWS S3</dd></div>
+          </dl>
+        </div>
       </div>
-      <nav class="footer__nav">
-        <a href="#perfil">Perfil</a>
-        <a href="#habilidades">Habilidades</a>
-        <a href="#proyectos">Proyectos</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
+    </section>
+
+    <section class="contact" id="contacto" aria-labelledby="contact-title">
+      <div class="shell contact-grid">
+        <div>
+          <p class="eyebrow">Contacto</p>
+          <h2 id="contact-title">Hablemos<span>.</span></h2>
+          <p>Si estás armando un proyecto de datos o buscas a alguien para una práctica, escríbeme.</p>
+        </div>
+        <div class="contact-links">
+          <div class="email-row">
+            <a href="mailto:samipikdo@gmail.com">samipikdo@gmail.com <span class="arrow-diagonal" aria-hidden="true"></span></a>
+            <button id="copy-email" type="button" hidden>Copiar</button>
+            <p id="copy-status" class="visually-hidden" role="status"></p>
+          </div>
+          <a href="https://www.linkedin.com/in/samuel-picado-8082373b4">LinkedIn <span class="arrow-diagonal" aria-hidden="true"></span></a>
+          <a href="https://github.com/samuelpicado">GitHub <span class="arrow-diagonal" aria-hidden="true"></span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <p>Samuel Picado</p>
+      <a href="#inicio">Volver al inicio <span aria-hidden="true">↑</span></a>
     </div>
   </footer>
-
 </body>
 </html>

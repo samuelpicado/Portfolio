@@ -1,0 +1,255 @@
+.lab-grid {
+  --lab-surface: #20241b;
+  --lab-panel: #292e23;
+  --lab-ink: #efeee6;
+  --lab-muted: #bbc0af;
+  --lab-rule: #565f4d;
+  --lab-gridline: #41493b;
+  --lab-accent: #d3ee75;
+  --lab-mono: var(--mono, ui-monospace, Consolas, monospace);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1.85fr) minmax(0, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  color: var(--lab-ink);
+}
+
+.lab-grid[hidden] {
+  display: none;
+}
+
+.lab-chart,
+.lab-console {
+  min-inline-size: 0;
+  margin: 0;
+  border: 1px solid var(--lab-rule);
+  border-radius: 4px;
+}
+
+.lab-chart {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(0.6rem, 2vw, 1.15rem);
+  background: var(--lab-surface);
+  container-type: inline-size;
+}
+
+.lab-chart svg {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  color: var(--lab-muted);
+  font-family: var(--lab-mono);
+  font-size: 15px;
+}
+
+.lab-chart figcaption {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.25rem 1rem;
+  margin-block-end: 0.875rem;
+  padding-block-end: 0.75rem;
+  border-block-end: 1px solid var(--lab-gridline);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.lab-chart figcaption span {
+  color: var(--lab-muted);
+  font: 400 0.76rem/1.45 var(--lab-mono);
+}
+
+.lab-plot-grid line {
+  stroke: var(--lab-gridline);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.lab-plot-axes path {
+  fill: none;
+  stroke: var(--lab-rule);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.lab-plot-axes text,
+.lab-plot-legend text {
+  fill: currentColor;
+}
+
+.lab-plot-variable {
+  font-style: italic;
+}
+
+.lab-plot-point,
+.lab-plot-legend circle {
+  fill: var(--lab-ink);
+  fill-opacity: 0.82;
+}
+
+.lab-plot-residuals line {
+  stroke: var(--lab-accent);
+  stroke-opacity: 0.32;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.lab-plot-fit,
+.lab-plot-legend line {
+  stroke: var(--lab-accent);
+  stroke-width: 2;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.lab-console {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  background: var(--lab-panel);
+}
+
+.lab-controls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 1rem;
+}
+
+.lab-controls label {
+  color: var(--lab-ink);
+  font-size: 0.94rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lab-controls output {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--lab-rule);
+  border-radius: 2px;
+  color: var(--lab-accent);
+  font: 600 0.86rem/1.2 var(--lab-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.lab-controls input[type='range'] {
+  --lab-slider-track: linear-gradient(to right, var(--lab-accent) var(--lab-noise, 42%),
+    #7a866f var(--lab-noise, 42%));
+  --lab-slider-thumb: linear-gradient(90deg, transparent 35%, #82974b 35% 43%,
+    transparent 43% 57%, #82974b 57% 65%, transparent 65%), var(--lab-accent);
+
+  appearance: none;
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 44px;
+  margin: 0.25rem 0 0;
+  border-radius: 2px;
+  background: transparent;
+  accent-color: var(--lab-accent);
+  cursor: pointer;
+}
+
+.lab-controls input[type='range']:focus-visible {
+  outline: 2px solid var(--lab-accent);
+  outline-offset: 3px;
+}
+
+.lab-controls input[type='range']::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 2px;
+  background: var(--lab-slider-track);
+}
+
+.lab-controls input[type='range']::-moz-range-track {
+  height: 6px;
+  border-radius: 2px;
+  background: var(--lab-slider-track);
+}
+
+.lab-controls input[type='range']::-webkit-slider-thumb {
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  margin-top: -10px;
+  border: 1px solid #a9c250;
+  border-radius: 3px;
+  background: var(--lab-slider-thumb);
+  box-shadow: 0 3px 0 #151912;
+}
+
+.lab-controls input[type='range']::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border: 1px solid #a9c250;
+  border-radius: 3px;
+  background: var(--lab-slider-thumb);
+  box-shadow: 0 3px 0 #151912;
+}
+
+.lab-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.lab-metrics > div {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-inline-size: 0;
+  padding-block-start: 0.8rem;
+  border-block-start: 1px solid var(--lab-rule);
+}
+
+.lab-metrics dt {
+  color: var(--lab-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.lab-metrics dd {
+  margin: 0;
+  color: var(--lab-ink);
+  font: 500 clamp(1.75rem, 3.1vw, 2.5rem)/1 var(--lab-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.065em;
+}
+
+@media (max-width: 760px) {
+  .lab-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@container (max-width: 440px) {
+  .lab-chart svg {
+    font-size: 22px;
+  }
+
+  .lab-plot-point,
+  .lab-plot-legend circle {
+    r: 5px;
+  }
+}
+
+@container (max-width: 350px) {
+  .lab-chart svg {
+    font-size: 27px;
+  }
+}
+
+@media (forced-colors: active) {
+  .lab-controls input[type='range'] {
+    appearance: auto;
+  }
+
+  .lab-controls input[type='range']:focus-visible {
+    outline-color: Highlight;
+  }
+}

@@ -1,59 +1,24 @@
-# Personal Portfolio
+# Samuel Picado · Portfolio
 
-## Overview
+Cuaderno de campo de Ingeniería en Sistemas, datos y machine learning. Reúne dos casos académicos y un experimento con regresión lineal. El laboratorio calcula el ajuste con datos sintéticos reproducibles en el navegador. Sus métricas pertenecen a la simulación.
 
-A Spanish-language personal portfolio built with HTML and CSS for a Programming IV laboratory assignment. The page presents Samuel Picado's student profile, skills, academic project descriptions, and contact information.
+## Vista local
 
-The original coursework connects the portfolio's AI and machine learning focus to an analysis of five job postings. That research describes career interests and employer requirements; the implementation in this repository is a static website.
-
-## Features
-
-- A single page with navigation to profile, skills, projects, and contact sections.
-- A responsive layout using CSS Grid, Flexbox, and media queries.
-- Skill cards, tool tags, and two academic project presentation cards.
-- Email, LinkedIn, and GitHub contact links, plus a contact form interface.
-- Smooth anchor scrolling and CSS visual effects.
-
-## Technology
-
-- HTML for page structure and Spanish-language content.
-- CSS for layout, styling, and responsive behavior.
-- Google Fonts for the Inter typeface and Unsplash for the hero image.
-
-The page contains no JavaScript and needs no package installation or build step. Python, machine learning libraries, and AWS appear in the page's portfolio content and the coursework research; they are not website runtime dependencies.
-
-The original README credits the design to this [Figma reference](https://www.figma.com/make/WEBg3CYPDoMJ56FU6m33SB/Implementar-instrucciones-del-archivo?p=f&t=bP6UCjbnzHARlRZ3-0).
-
-## Getting started
-
-Clone the repository and open `index.html` in a browser:
+Ejecuta un servidor HTTP desde la raíz para que el navegador pueda cargar los módulos de JavaScript.
 
 ```bash
-git clone https://github.com/samuelpicado/Laboratorio-1-Programacion-4.git
-cd Laboratorio-1-Programacion-4
+python3 -m http.server 4173
 ```
 
-For an optional local HTTP preview, use Python 3 from the repository root:
+Abre <http://localhost:4173/>. El sitio no necesita instalación, compilación ni recursos de terceros durante la visita. Los textos, los casos y los enlaces de contacto también funcionan sin JavaScript.
 
-```bash
-python3 -m http.server 8000 --bind 127.0.0.1
-```
+## Publicación
 
-Then open <http://127.0.0.1:8000>. Keep `index.html` and `styles.css` together. An internet connection is needed to load the external font and hero image.
+[GitHub Pages](https://samuelpicado.github.io/Portfolio/) sirve la raíz de la rama `main`. Los recursos usan rutas relativas al sitio del repositorio.
 
-The contact form posts to `#` and has no receiving backend in this repository, so it does not deliver messages. The existing email link opens the visitor's configured mail application. Both project detail buttons currently use `#` placeholders.
+La entrada usa [Anime.js](https://animejs.com/) 4.5.0 y los casos usan [Motion](https://motion.dev/) 14.14.0. El módulo local `assets/animation.js` agrupa `createTimeline` y `stagger` de `animejs` y `animate` de `motion/mini`. Las licencias se incluyen junto a los recursos. El control del laboratorio toma como referencia [Kokonut UI](https://kokonutui.com/) y la visualización, [Bklit](https://bklit.com/).
 
-## Repository layout
-
-| Path | Purpose |
-| --- | --- |
-| `index.html` | Portfolio sections, project descriptions, and contact interface. |
-| `styles.css` | Shared styles, components, animations, and responsive rules. |
-| `README.md` | Project overview, setup, and the coursework research context. |
-
-## Project status
-
-Academic frontend project. The repository contains the portfolio page and styles; it does not include the machine learning implementations described in the project cards. Form delivery and project detail destinations remain unimplemented.
+Las tres imágenes editoriales son ilustraciones generadas para este rediseño. La investigación y el crédito del diseño académico original se conservan abajo.
 
 <details>
 <summary>Original coursework research (Spanish)</summary>
