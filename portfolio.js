@@ -117,6 +117,7 @@ function setupProjects() {
   let scrollIdle = 0;
   let lastScroll = 0;
   let direction = 1;
+  let previousProgress = 0;
 
   const fitTitle = () => {
     const { offsetWidth } = reelTitle;
@@ -164,6 +165,24 @@ function setupProjects() {
     direction = Math.sign(scroll - lastScroll) || direction;
     lastScroll = scroll;
 
+    // The two copies make the progress wipe continuous across the loop.
+    const beforeFirst = guide < first;
+    const afterLast = guide > last;
+    const fraction = beforeFirst ? (first - guide) / (first - lastCopy)
+      : afterLast ? (firstCopy - guide) / (firstCopy - last)
+      : (guide - first) / (last - first);
+    const progress = Math.max(0, Math.min(1, fraction));
+    // A wheel tick can skip straight to the first copy without painting the wipe.
+    if (afterLast && progress < .03 && previousProgress > .15 && !reducedMotion.matches) {
+      controls.style.setProperty('--reel-progress-before-wrap', previousProgress);
+      controls.setAttribute('data-progress-jump', '');
+    } else if (!beforeFirst && !afterLast && progress > .03) {
+      controls.removeAttribute('data-progress-jump');
+    }
+    controls.toggleAttribute('data-progress-seam', beforeFirst || afterLast);
+    controls.style.setProperty('--reel-progress', progress);
+    previousProgress = progress;
+
     // Once an identical copy comes into focus, keep its offset on the real card.
     const pastStart = desktop ? guide < lastCopy + 1 : guide < first - 2;
     const pastEnd = guide >= firstCopy - 1;
@@ -195,8 +214,6 @@ function setupProjects() {
       }
     });
 
-    const progress = Math.max(0, Math.min(1, (guide - first) / (last - first)));
-    controls.style.setProperty('--reel-progress', String(progress));
     setCurrent(active);
   };
 
@@ -210,23 +227,53 @@ function setupProjects() {
     carousel.scrollTo({ top: carousel.scrollTop + offset, behavior });
   };
 
+  const projectAt = hash => projects.find(card => '#' + card.id === hash);
+
+  const centerProject = (project, behavior) => {
+    carousel.scrollIntoView({ block: 'center', inline: 'nearest', behavior });
+    const wrapsForward = behavior === 'smooth' && current === projectCount - 1 && project === projects[0];
+    scrollToCard(wrapsForward ? after[0] : project, behavior);
+    project.focus({ preventScroll: true });
+  };
+
   const goTo = (index) => {
     const target = (index + projectCount) % projectCount;
     if (target === current) return;
     status.textContent = `Caso ${target + 1} de ${projectCount}: ${titles[target]}`;
     const motion = !reducedMotion.matches;
-    const useCopy = motion && carouselLayout.matches;
-    const destination = useCopy && index === -1 ? before.at(-1)
-      : useCopy && index === projectCount ? after[0] : projects[target];
-    scrollToCard(destination, motion && (useCopy || index === target) ? 'smooth' : 'instant');
+    const destination = motion && index === -1 ? before.at(-1)
+      : motion && index === projectCount ? after[0] : projects[target];
+    scrollToCard(destination, motion ? 'smooth' : 'instant');
   };
+
+  document.querySelector('.case-nav')?.addEventListener('click', (event) => {
+    const link = event.target.closest('a[data-case-link]');
+    if (!link || event.defaultPrevented || event.button !== 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const project = projectAt(link.hash);
+    if (!project) return;
+
+    event.preventDefault();
+    if (location.hash !== link.hash) {
+      const previous = projectAt(location.hash);
+      if (previous) history.replaceState({ ...history.state, reelCase: previous.id }, '');
+      history.pushState({ ...history.state, reelCase: project.id }, '', link.hash);
+    }
+    centerProject(project, reducedMotion.matches ? 'instant' : 'smooth');
+  });
+
+  window.addEventListener('popstate', (event) => {
+    const project = projectAt(location.hash);
+    if (project && project.id === event.state?.reelCase) {
+      requestAnimationFrame(() => centerProject(project, 'instant'));
+    }
+  });
 
   track.prepend(...before);
   track.append(...after);
   carousel.dataset.ready = '';
   carousel.setAttribute('aria-describedby', 'reel-instructions');
   controls.hidden = false;
-  const linkedProject = projects.find(project => '#' + project.id === location.hash);
+  const linkedProject = projectAt(location.hash);
   if (linkedProject) {
     linkedProject.scrollIntoView({ block: carouselLayout.matches ? 'center' : 'start', behavior: 'instant' });
   } else {
@@ -251,8 +298,14 @@ function setupProjects() {
     scrollToCard(projects[Math.max(current, 0)], 'instant');
     scheduleTracking();
   });
+  controls.addEventListener('animationend', (event) => {
+    if (event.animationName === 'reel-wrap') controls.removeAttribute('data-progress-jump');
+  });
   reducedMotion.addEventListener('change', () => {
-    if (reducedMotion.matches) reelTitle.getAnimations().forEach(animation => animation.cancel());
+    if (reducedMotion.matches) {
+      controls.removeAttribute('data-progress-jump');
+      reelTitle.getAnimations().forEach(animation => animation.cancel());
+    }
     scheduleTracking();
   });
   carousel.addEventListener('keydown', (event) => {

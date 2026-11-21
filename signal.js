@@ -83,7 +83,8 @@ function setupOpeningPoints() {
     const time = elapsed / 1000;
     const cursorX = pointer ? pointer.x - rect.left : 0;
     const cursorY = pointer ? pointer.y - rect.top : 0;
-    const radius = width < 520 ? 62 : 88;
+    const radius = width < 520 ? 96 : 144;
+    const strength = width < 520 ? 70 : 84;
     const radiusSquared = radius * radius;
     context.clearRect(0, 0, width, height);
     context.globalAlpha = dark ? .42 : .28;
@@ -98,7 +99,7 @@ function setupOpeningPoints() {
       let push = 0;
       if (moving && pointer && distanceSquared < radiusSquared) {
         const distance = Math.sqrt(distanceSquared);
-        push = (1 - distance / radius) ** 2 * 52 / Math.max(distance, .01);
+        push = (1 - distance / radius) ** 2 * strength / Math.max(distance, .01);
       }
       point.offsetX = moving ? point.offsetX * .76 + dx * push * .24 : 0;
       point.offsetY = moving ? point.offsetY * .76 + dy * push * .24 : 0;
@@ -127,6 +128,42 @@ function setupOpeningPoints() {
   reducedMotion.addEventListener('change', () => {
     pointer = undefined;
     schedulePaint();
+  });
+}
+
+function setupNameJelly() {
+  const name = document.querySelector('.opening-name');
+  if (!name) return;
+
+  const ripples = new Map();
+  let last;
+  name.addEventListener('pointermove', (event) => {
+    if (reducedMotion.matches || event.pointerType === 'touch') return;
+    const line = event.target.closest('.opening-name > span');
+    if (!line || ripples.get(line)?.playState === 'running') return;
+
+    const { left, width } = line.getBoundingClientRect();
+    if (last?.line === line && Math.abs(event.clientX - last.x) < width / 4) return;
+    last = { line, x: event.clientX };
+
+    const pivot = Math.min(100, Math.max(0, (event.clientX - left) / width * 100));
+    const lean = (pivot - 50) / 20;
+    const frames = [
+      'none',
+      `scale(1.06, .87) skewX(${lean}deg)`,
+      `scale(.965, 1.09) skewX(${-lean * .55}deg)`,
+      'scale(1.015, .975)',
+      'none',
+    ];
+    ripples.set(line, line.animate(frames.map(transform => ({
+      transform, transformOrigin: `${pivot}% 62%`, easing: 'ease-out',
+    })), { duration: 590 }));
+  }, { passive: true });
+
+  name.addEventListener('pointerleave', () => { last = undefined; });
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) ripples.forEach(animation => animation.cancel());
+    last = undefined;
   });
 }
 
@@ -356,5 +393,6 @@ function setupCursorSignal() {
 }
 
 setupOpeningPoints();
+setupNameJelly();
 setupSignalField();
 setupCursorSignal();

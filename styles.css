@@ -409,6 +409,8 @@ img { display: block; max-width: 100%; }
   content: "";
 }
 
+.project-controls[data-progress-seam] .reel-progress::after { transform-origin: right; }
+
 .reel-exit {
   justify-self: end;
   display: inline-flex;
@@ -579,6 +581,15 @@ img { display: block; max-width: 100%; }
 
 @media (prefers-reduced-motion: no-preference) {
   html, #project-carousel[data-ready] { scroll-behavior: smooth; }
+  .project-controls[data-progress-jump] .reel-progress::after {
+    transform-origin: right;
+    animation: reel-wrap .44s ease-in-out both;
+  }
+  @keyframes reel-wrap {
+    from { transform: scaleX(var(--reel-progress-before-wrap)); }
+    to { transform: scaleX(0); }
+  }
+
   .case-nav a { transition: background-color .22s, color .22s; }
   .case-nav a > span, .reel-exit > span { transition: transform .3s var(--ease), color .24s; }
   .case-nav a:is(:hover, :focus-visible) > span { transform: translateX(-.2rem); color: var(--accent); }
