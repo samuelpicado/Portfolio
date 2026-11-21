@@ -16,14 +16,15 @@ Abre <http://localhost:4173/>. El sitio no necesita instalación, compilación n
 
 [GitHub Pages](https://samuelpicado.github.io/Portfolio/) sirve la raíz de la rama `main`. Los recursos usan rutas relativas al sitio del repositorio.
 
-La portada toma como referencia la jerarquía de [Daniel Ingrassia](https://ingrassiadaniel.it/). El recorrido vertical y la transición de tema se inspiran en [Eugene Tykva](https://eugenetkv.com/). La secuencia de Mahjong usa [Anime.js](https://animejs.com/) desde el módulo local `assets/animation.js`. Las licencias de las bibliotecas incluidas están junto al módulo.
+La portada toma como referencia la jerarquía de [Daniel Ingrassia](https://ingrassiadaniel.it/). El recorrido vertical y la transición de tema se inspiran en [Eugene Tykva](https://eugenetkv.com/). Para el panel lateral, [Liquid Glass React](https://github.com/rdev/liquid-glass-react) sirvió de referencia para las capas de vidrio y el brillo del canto. La secuencia de Mahjong usa [Anime.js](https://animejs.com/) desde el módulo local `assets/animation.js`. Las licencias de las bibliotecas incluidas están junto al módulo.
 
 ## Contenido
 
 - `index.html` contiene el mapa, los casos, el catálogo completo, el perfil y el contacto. Cada caso destacado tiene un enlace directo.
-- `styles.css` contiene los temas, el marco fijo del carrusel y su perspectiva. En pantallas pequeñas los casos siguen el flujo de lectura normal.
+- `opening.css` y `signal.js` presentan el campo de señales, sus partículas y la estela del puntero. `navigation.css` y `navigation.js` controlan el vidrio del panel lateral y su indicador de sección.
+- `styles.css` contiene los temas, la perspectiva del carrusel y el fondo que atraviesa la galería.
 - `case-art.css` presenta los esquemas de los casos y sus secuencias breves de entrada.
-- `portfolio.js` calcula la profundidad a partir del desplazamiento nativo, sincroniza el mapa con el caso visible, guarda el tema y añade la secuencia de Mahjong y la copia del correo. Los casos y los enlaces están disponibles sin JavaScript.
+- `portfolio.js` enlaza los extremos del carrusel en ambos sentidos con desplazamiento nativo, sincroniza el mapa con el caso visible, guarda el tema y añade la secuencia de Mahjong y la copia del correo. Sin JavaScript los casos quedan disponibles como lista.
 - `assets/mahjong.webp` es la captura original de una partida local con dos jugadores ficticios. La secuencia de tres pasos explica el mecanismo de sincronización.
 
 Los casos se redactaron a partir de ambos CV y del [perfil de GitHub](https://github.com/samuelpicado). El índice enlaza al código cuando se pudo verificar que el repositorio es público. La investigación y el crédito del diseño académico original se conservan abajo.

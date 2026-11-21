@@ -81,119 +81,184 @@ function setupTheme() {
 
 function setupProjects() {
   const carousel = document.querySelector('#project-carousel');
+  const track = carousel?.querySelector('.project-track');
   const controls = document.querySelector('.project-controls');
   const position = document.querySelector('#project-position');
   const status = document.querySelector('#project-status');
   const reelTitle = document.querySelector('#reel-title');
-  if (!carousel || !controls || !position || !status || !reelTitle) return;
+  if (!track || !controls || !position || !status || !reelTitle) return;
 
-  const projects = [...carousel.children].filter((child) => child.matches('.project'));
-  if (!projects.length) return;
+  const projects = [...track.children];
+  if (projects.length < 2) return;
 
-  const previous = controls.querySelector('[data-project-step="-1"]');
-  const next = controls.querySelector('[data-project-step="1"]');
+  const titles = projects.map(project => project.querySelector('h3').textContent);
   const links = document.querySelectorAll('[data-case-link]');
   const carouselLayout = matchMedia('(min-width: 57rem) and (min-height: 42rem)');
+  const projectCount = projects.length;
+  const copyCount = 2;
+
+  const copy = (project) => {
+    const clone = project.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.removeAttribute('aria-labelledby');
+    clone.inert = true;
+    clone.setAttribute('aria-hidden', 'true');
+    clone.dataset.reelCopy = '';
+    for (const element of clone.querySelectorAll('[id]')) element.removeAttribute('id');
+    return clone;
+  };
+
+  projects.forEach(project => { project.dataset.reelCase = project.id; });
+  const before = projects.slice(-copyCount).map(copy);
+  const after = projects.slice(0, copyCount).map(copy);
+  const cards = [...before, ...projects, ...after];
   let current = -1;
   let frame = 0;
+  let scrollIdle = 0;
+  let lastScroll = 0;
+  let direction = 1;
+
+  const fitTitle = () => {
+    const { offsetWidth } = reelTitle;
+    if (offsetWidth) reelTitle.style.setProperty('--reel-title-scale', Math.max(1, innerWidth / offsetWidth));
+  };
 
   const setCurrent = (index) => {
     if (index === current) return;
-    const direction = Math.sign(index - current);
     const firstSelection = current < 0;
     projects[current]?.removeAttribute('data-current');
     current = index;
     projects[index].setAttribute('data-current', '');
+
     for (const link of links) {
       if (link.hash === '#' + projects[index].id) link.setAttribute('aria-current', 'true');
       else link.removeAttribute('aria-current');
     }
-    position.textContent = `${String(index + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')}`;
-    previous?.setAttribute('aria-disabled', String(index === 0));
-    next?.setAttribute('aria-disabled', String(index === projects.length - 1));
-
-    reelTitle.textContent = projects[index].querySelector('h3').textContent;
-    if (!firstSelection && carouselLayout.matches && !reducedMotion.matches) {
+    position.textContent = `${String(index + 1).padStart(2, '0')} / ${String(projectCount).padStart(2, '0')}`;
+    reelTitle.textContent = titles[index];
+    fitTitle();
+    if (!firstSelection && !reducedMotion.matches) {
       reelTitle.getAnimations().forEach(animation => animation.cancel());
       reelTitle.animate([
-        { translate: `${direction * 7}% 0`, opacity: 0 },
-        { translate: '0 0', opacity: 1 },
-      ], { duration: 520, easing: 'cubic-bezier(.19, 1, .22, 1)' });
+        { transform: `translateX(${direction * 5}%)`, opacity: 0 },
+        { transform: 'translateX(0)', opacity: 1 },
+      ], { duration: 500, easing: 'cubic-bezier(.19, 1, .22, 1)' });
     }
   };
 
-  const trackCurrent = () => {
+  const getGuide = (desktop) => carousel.getBoundingClientRect().top + carousel.clientTop +
+    (desktop ? carousel.clientHeight / 2 : parseFloat(getComputedStyle(carousel).scrollPaddingTop) || 0);
+
+  const getStop = (bounds, desktop) => bounds.top + (desktop ? bounds.height / 2 : 0);
+
+  const trackCurrent = (settled = false) => {
     frame = 0;
     const desktop = carouselLayout.matches;
-    const scrollHeight = desktop ? carousel.clientHeight : innerHeight;
-    const guide = desktop
-      ? carousel.getBoundingClientRect().top + carousel.clientTop + scrollHeight / 2
-      : scrollHeight * 0.45;
-    const animateDepth = desktop && !reducedMotion.matches;
-    const bounds = projects.map(project => project.getBoundingClientRect());
-    const progress = desktop ? carousel.scrollTop / Math.max(1, carousel.scrollHeight - scrollHeight) : 0;
+    const guide = getGuide(desktop);
+    const stops = cards.map(card => getStop(card.getBoundingClientRect(), desktop));
+    const first = stops[copyCount];
+    const last = stops[copyCount + projectCount - 1];
+    const firstCopy = stops[copyCount + projectCount];
+    const lastCopy = stops[copyCount - 1];
+    const scroll = carousel.scrollTop;
+    direction = Math.sign(scroll - lastScroll) || direction;
+    lastScroll = scroll;
+
+    // Once an identical copy comes into focus, keep its offset on the real card.
+    const pastStart = desktop ? guide < lastCopy + 1 : guide < first - 2;
+    const pastEnd = guide >= firstCopy - 1;
+    if (settled && (pastStart || pastEnd)) {
+      const shift = pastEnd ? first - firstCopy : desktop ? last - lastCopy : firstCopy - first;
+      lastScroll = scroll + shift;
+      carousel.dataset.recentering = '';
+      carousel.scrollTo({ top: lastScroll, behavior: 'instant' });
+      requestAnimationFrame(() => {
+        delete carousel.dataset.recentering;
+        scheduleTracking();
+      });
+      return;
+    }
 
     let best = Infinity;
     let active = 0;
-    bounds.forEach(({ top, height, bottom }, index) => {
-      const offset = top + height / 2 - guide;
-      const distance = desktop ? Math.abs(offset) : Math.max(top - guide, guide - bottom, 0);
-      if (animateDepth) {
-        const depth = Math.max(-1, Math.min(1, offset / (scrollHeight * 0.75)));
-        projects[index].style.setProperty('--reel-offset', depth.toFixed(3));
-        projects[index].style.setProperty('--reel-distance', Math.abs(depth).toFixed(3));
+    stops.forEach((stop, index) => {
+      const offset = stop - guide;
+      if (desktop && !reducedMotion.matches) {
+        const depth = Math.max(-1, Math.min(1, offset / (carousel.clientHeight * 0.75)));
+        cards[index].style.setProperty('--reel-offset', depth.toFixed(3));
+        cards[index].style.setProperty('--reel-distance', Math.abs(depth).toFixed(3));
       }
+      const distance = desktop ? Math.abs(offset) : offset <= 3 ? -offset : Infinity;
       if (distance < best) {
         best = distance;
-        active = index;
+        active = (index - copyCount + projectCount) % projectCount;
       }
     });
-    controls.style.setProperty('--reel-progress', String(Math.max(0, Math.min(1, progress))));
+
+    const progress = Math.max(0, Math.min(1, (guide - first) / (last - first)));
+    controls.style.setProperty('--reel-progress', String(progress));
     setCurrent(active);
   };
 
   const scheduleTracking = () => {
-    if (!frame) frame = requestAnimationFrame(trackCurrent);
+    if (!frame) frame = requestAnimationFrame(() => trackCurrent());
+  };
+
+  const scrollToCard = (card, behavior) => {
+    const desktop = carouselLayout.matches;
+    const offset = getStop(card.getBoundingClientRect(), desktop) - getGuide(desktop);
+    carousel.scrollTo({ top: carousel.scrollTop + offset, behavior });
   };
 
   const goTo = (index) => {
-    const project = projects[index];
-    if (!project || index === current) return;
-    status.textContent = `Caso ${index + 1} de ${projects.length}: ${project.querySelector('h3').textContent}`;
-    const behavior = reducedMotion.matches ? 'instant' : 'smooth';
-    if (!carouselLayout.matches) {
-      project.scrollIntoView({ block: 'start', behavior });
-      return;
-    }
-    const bounds = project.getBoundingClientRect();
-    const offset = bounds.top - carousel.getBoundingClientRect().top - carousel.clientTop;
-    const center = offset + (bounds.height - carousel.clientHeight) / 2;
-    carousel.scrollTo({ top: carousel.scrollTop + center, behavior });
+    const target = (index + projectCount) % projectCount;
+    if (target === current) return;
+    status.textContent = `Caso ${target + 1} de ${projectCount}: ${titles[target]}`;
+    const motion = !reducedMotion.matches;
+    const useCopy = motion && carouselLayout.matches;
+    const destination = useCopy && index === -1 ? before.at(-1)
+      : useCopy && index === projectCount ? after[0] : projects[target];
+    scrollToCard(destination, motion && (useCopy || index === target) ? 'smooth' : 'instant');
   };
 
+  track.prepend(...before);
+  track.append(...after);
   carousel.dataset.ready = '';
+  carousel.setAttribute('aria-describedby', 'reel-instructions');
   controls.hidden = false;
-  const linkedProject = projects.findIndex(({ id }) => '#' + id === location.hash);
-  if (linkedProject >= 0) {
-    const block = carouselLayout.matches ? 'center' : 'start';
-    projects[linkedProject].scrollIntoView({ block, behavior: 'instant' });
+  const linkedProject = projects.find(project => '#' + project.id === location.hash);
+  if (linkedProject) {
+    linkedProject.scrollIntoView({ block: carouselLayout.matches ? 'center' : 'start', behavior: 'instant' });
+  } else {
+    scrollToCard(projects[0], 'instant');
   }
   trackCurrent();
-  carousel.addEventListener('scroll', scheduleTracking, { passive: true });
-  window.addEventListener('scroll', () => {
-    if (!carouselLayout.matches) scheduleTracking();
+
+  const hasScrollEnd = 'onscrollend' in carousel;
+  carousel.addEventListener('scroll', () => {
+    scheduleTracking();
+    if (!hasScrollEnd) {
+      clearTimeout(scrollIdle);
+      scrollIdle = setTimeout(() => trackCurrent(true), 120);
+    }
   }, { passive: true });
-  window.addEventListener('resize', scheduleTracking, { passive: true });
+  if (hasScrollEnd) carousel.addEventListener('scrollend', () => trackCurrent(true));
+  window.addEventListener('resize', () => {
+    fitTitle();
+    scheduleTracking();
+  }, { passive: true });
+  carouselLayout.addEventListener('change', () => {
+    scrollToCard(projects[Math.max(current, 0)], 'instant');
+    scheduleTracking();
+  });
   reducedMotion.addEventListener('change', () => {
     if (reducedMotion.matches) reelTitle.getAnimations().forEach(animation => animation.cancel());
     scheduleTracking();
   });
-  previous?.addEventListener('click', () => goTo(current - 1));
-  next?.addEventListener('click', () => goTo(current + 1));
   carousel.addEventListener('keydown', (event) => {
     if (event.target !== carousel || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-    const targets = { ArrowUp: current - 1, ArrowDown: current + 1, Home: 0, End: projects.length - 1 };
-    if (!Object.hasOwn(targets, event.key) || !projects[targets[event.key]] || targets[event.key] === current) return;
+    const targets = { ArrowUp: current - 1, ArrowDown: current + 1, Home: 0, End: projectCount - 1 };
+    if (!Object.hasOwn(targets, event.key)) return;
     event.preventDefault();
     goTo(targets[event.key]);
   });
@@ -210,8 +275,12 @@ function setupMatchReplay() {
   let timeline;
 
   const showStep = (step) => {
-    trace.dataset.step = String(step);
-    stops.forEach((stop, index) => stop.toggleAttribute('data-passed', index < step));
+    for (const copy of document.querySelectorAll('.match-trace')) {
+      copy.dataset.step = String(step);
+      copy.querySelectorAll('.match-stops > li').forEach((stop, index) => {
+        stop.toggleAttribute('data-passed', index < step);
+      });
+    }
   };
 
   const complete = () => {
@@ -256,6 +325,7 @@ function setupMatchReplay() {
 }
 
 setupTheme();
-setupProjects();
 setupMatchReplay();
+// The carousel uses text height to locate its first real card.
+document.fonts.ready.then(setupProjects);
 setupContact();
