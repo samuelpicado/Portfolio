@@ -1,6 +1,6 @@
 # Samuel Picado · Portfolio
 
-Cuaderno de campo de Ingeniería en Sistemas, datos y machine learning. Reúne dos casos académicos y un experimento con regresión lineal. El laboratorio calcula el ajuste con datos sintéticos reproducibles en el navegador. Sus métricas pertenecen a la simulación.
+Portfolio de Samuel Alonso Picado Marín, estudiante de Ingeniería en Sistemas de Información en la Universidad Nacional de Costa Rica. Un mapa agrupa mis proyectos web y de escritorio por el tipo de problema que resuelven y lleva a un recorrido por los casos y mis aportes.
 
 ## Vista local
 
@@ -16,9 +16,16 @@ Abre <http://localhost:4173/>. El sitio no necesita instalación, compilación n
 
 [GitHub Pages](https://samuelpicado.github.io/Portfolio/) sirve la raíz de la rama `main`. Los recursos usan rutas relativas al sitio del repositorio.
 
-La entrada usa [Anime.js](https://animejs.com/) 4.5.0 y los casos usan [Motion](https://motion.dev/) 14.14.0. El módulo local `assets/animation.js` agrupa `createTimeline` y `stagger` de `animejs` y `animate` de `motion/mini`. Las licencias se incluyen junto a los recursos. El control del laboratorio toma como referencia [Kokonut UI](https://kokonutui.com/) y la visualización, [Bklit](https://bklit.com/).
+La portada toma como referencia la jerarquía de [Daniel Ingrassia](https://ingrassiadaniel.it/). El recorrido vertical y la transición de tema se inspiran en [Eugene Tykva](https://eugenetkv.com/). La secuencia de Mahjong usa [Anime.js](https://animejs.com/) desde el módulo local `assets/animation.js`. Las licencias de las bibliotecas incluidas están junto al módulo.
 
-Las tres imágenes editoriales son ilustraciones generadas para este rediseño. La investigación y el crédito del diseño académico original se conservan abajo.
+## Contenido
+
+- `index.html` contiene el mapa, los casos, el catálogo completo, el perfil y el contacto. Cada caso destacado tiene un enlace directo.
+- `styles.css` contiene los temas y el recorrido con desplazamiento vertical nativo. En pantallas pequeñas los casos siguen el flujo de lectura normal.
+- `portfolio.js` sincroniza los enlaces del mapa con el caso visible, guarda el tema y añade la secuencia de Mahjong y la copia del correo. Los casos y los enlaces están disponibles sin JavaScript.
+- `assets/mahjong.webp` es la captura original de una partida local con dos jugadores ficticios. La secuencia de tres pasos explica el mecanismo de sincronización.
+
+Los casos se redactaron a partir de ambos CV y del [perfil de GitHub](https://github.com/samuelpicado). El índice enlaza al código cuando se pudo verificar que el repositorio es público. La investigación y el crédito del diseño académico original se conservan abajo.
 
 <details>
 <summary>Original coursework research (Spanish)</summary>

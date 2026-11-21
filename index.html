@@ -3,14 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#191d15">
-  <meta name="description" content="Portfolio de Samuel Picado, estudiante de Ingeniería en Sistemas. Proyectos académicos y experimentos de machine learning y datos.">
-  <title>Samuel Picado · Ingeniería en Sistemas &amp; Machine Learning</title>
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Portfolio de Samuel Alonso Picado Marín. Desarrollo web y de escritorio, APIs y bases de datos. Ingeniería en Sistemas de Información en la Universidad Nacional de Costa Rica.">
+  <title>Samuel Picado · Desarrollo web y de escritorio</title>
   <link rel="icon" href="assets/mark.png" type="image/png">
   <link rel="preload" href="assets/bricolage.woff2" as="font" type="font/woff2" crossorigin>
+  <script>
+    try {
+      const theme = localStorage.getItem('portfolio-theme');
+      if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+    } catch {}
+  </script>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="lab.css">
-  <script defer src="lab.js"></script>
   <script type="module" src="portfolio.js"></script>
 </head>
 <body>
@@ -19,139 +23,244 @@
   <header class="site-header">
     <div class="shell masthead">
       <a href="#inicio" class="brand" aria-label="Samuel Picado, inicio">
-        <img src="assets/mark.png" width="32" height="32" alt="">
+        <span class="brand-mark" aria-hidden="true"></span>
         <span>Samuel Picado</span>
       </a>
       <nav aria-label="Navegación principal">
         <a href="#proyectos">Proyectos</a>
-        <a href="#laboratorio">Laboratorio</a>
         <a href="#perfil">Perfil</a>
+        <a href="#contacto">Contacto</a>
       </nav>
-      <a class="header-contact" href="#contacto">Contacto <span class="arrow-diagonal" aria-hidden="true"></span></a>
+      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Modo oscuro" aria-pressed="false" hidden>
+        <span class="theme-icon" aria-hidden="true"></span>
+      </button>
     </div>
   </header>
 
   <main id="inicio" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
       <div class="shell hero-grid">
-        <figure class="hero-art">
-          <img src="assets/relieve.webp" width="1280" height="853" alt="" fetchpriority="high">
-          <figcaption>Relieve de datos <span aria-hidden="true"></span></figcaption>
-        </figure>
         <div class="hero-copy">
-          <p class="eyebrow hero-kicker"><span></span> Cuaderno de campo</p>
-          <h1 id="hero-title"><span class="hero-line">Samuel</span> <span class="hero-line">Picado<span class="hero-period">.</span></span></h1>
-          <p class="hero-intro">Estudio Ingeniería en Sistemas. Exploro cómo usar datos y machine learning para resolver problemas concretos.</p>
-          <div class="hero-actions">
-            <a class="button button-accent" href="#proyectos">Ver proyectos <span aria-hidden="true">↓</span></a>
-            <a class="hero-lab-link" href="#laboratorio">Probar el laboratorio <span class="arrow-diagonal" aria-hidden="true"></span></a>
-          </div>
+          <h1 id="hero-title">Samuel<br>Picado<span>.</span></h1>
+          <p class="hero-kicker">Desarrollo web y de escritorio</p>
+          <p class="hero-intro">Construyo software para coordinar personas, organizar procesos y explorar datos.</p>
+          <a class="button button-accent" href="#proyectos">Ver mi trabajo <span aria-hidden="true">↓</span></a>
         </div>
+        <nav class="decision-map" aria-labelledby="map-title">
+          <h2 id="map-title">Mapa de decisiones</h2>
+          <div class="map-routes">
+            <div class="map-route">
+              <p>Coordinar</p>
+              <ul>
+                <li><a href="#mahjong" data-case-link>Cooperative Mahjong</a></li>
+              </ul>
+            </div>
+            <div class="map-route">
+              <p>Organizar</p>
+              <ul>
+                <li><a href="#la-fuente" data-case-link>La Fuente</a></li>
+                <li><a href="#gestion-del-fin" data-case-link>Gestión del Fin</a></li>
+              </ul>
+            </div>
+            <div class="map-route">
+              <p>Explorar</p>
+              <ul>
+                <li><a href="#focus" data-case-link>FOCUS IDE</a></li>
+                <li><a href="#la-mancha" data-case-link>La Mancha</a></li>
+              </ul>
+            </div>
+          </div>
+        </nav>
         <div class="hero-end">
-          <p><span class="availability-dot"></span> Abierto a prácticas y proyectos remotos</p>
-          <span>Datos / Machine learning</span>
+          <p><span class="availability-dot" aria-hidden="true"></span> Disponible para trabajo temporal · dic. 2026–feb. 2027</p>
+          <p>Pérez Zeledón, Costa Rica</p>
         </div>
       </div>
     </section>
 
-    <section class="section work" id="proyectos" aria-labelledby="work-title">
+    <section class="work" id="proyectos" aria-labelledby="work-title">
       <div class="shell">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">Trabajo académico</p>
-            <h2 id="work-title">Proyectos seleccionados<span class="ink-period">.</span></h2>
+        <h2 class="work-title" id="work-title">Proyectos de equipo y personales</h2>
+
+        <div class="case-explorer">
+          <div class="case-sidebar">
+            <nav class="case-nav" aria-label="Casos destacados">
+              <ol>
+                <li><a href="#mahjong" data-case-link><span aria-hidden="true">01</span> Mahjong</a></li>
+                <li><a href="#la-fuente" data-case-link><span aria-hidden="true">02</span> La Fuente</a></li>
+                <li><a href="#gestion-del-fin" data-case-link><span aria-hidden="true">03</span> Gestión del Fin</a></li>
+                <li><a href="#focus" data-case-link><span aria-hidden="true">04</span> FOCUS IDE</a></li>
+                <li><a href="#la-mancha" data-case-link><span aria-hidden="true">05</span> La Mancha</a></li>
+              </ol>
+            </nav>
+            <div class="project-controls" hidden>
+              <button type="button" data-project-step="-1" aria-label="Proyecto anterior" aria-controls="project-carousel">↑</button>
+              <span id="project-position" aria-hidden="true">01 / 05</span>
+              <button type="button" data-project-step="1" aria-label="Proyecto siguiente" aria-controls="project-carousel">↓</button>
+              <span id="project-status" class="visually-hidden" role="status"></span>
+            </div>
+          </div>
+          <div id="project-carousel" class="project-carousel" role="region" aria-label="Recorrido de proyectos destacados" tabindex="0">
+            <article class="project" id="mahjong" aria-labelledby="mahjong-title" tabindex="-1">
+              <div class="project-body">
+                <h3 id="mahjong-title">Cooperative Mahjong</h3>
+                <p class="project-type">Multijugador en tiempo real</p>
+                <p>Dos jugadores comparten el tablero. Cuando alguien selecciona una ficha, la otra sesión la ve bloqueada.</p>
+                <div class="case-content">
+                  <p><strong>Mi aporte.</strong> Contribuí a la lógica multijugador en el servidor, los eventos de Socket.IO, los límites de jugadores y los estilos del cliente.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>TypeScript</li><li>Express</li><li>Socket.IO</li><li>React</li></ul>
+                </div>
+                <div class="project-source">
+                  <a href="https://github.com/MaikelJSQ24/mahjog_api" aria-label="API de Cooperative Mahjong en GitHub">API <span class="arrow-diagonal" aria-hidden="true"></span></a>
+                  <a href="https://github.com/MaikelJSQ24/mahjog_cliente" aria-label="Cliente de Cooperative Mahjong en GitHub">Cliente <span class="arrow-diagonal" aria-hidden="true"></span></a>
+                </div>
+              </div>
+              <div class="project-visual">
+                <figure class="project-figure project-capture">
+                  <a href="assets/mahjong.webp" aria-label="Ampliar captura de Cooperative Mahjong">
+                    <img src="assets/mahjong.webp" width="1180" height="757" alt="Tablero de Mahjong con una ficha seleccionada, otra bloqueada y el marcador de los jugadores Cometa y Nube." decoding="async">
+                    <span class="capture-zoom" aria-hidden="true">Ampliar ↗</span>
+                  </a>
+                  <figcaption>Partida local con dos jugadores ficticios</figcaption>
+                </figure>
+                <div class="match-trace" id="match-trace" data-step="0">
+                  <ol class="match-stops" aria-label="Esquema de sincronización">
+                    <li><span>Sesión A</span><strong>Selecciona</strong></li>
+                    <li><span>Socket.IO</span><strong>Propaga</strong></li>
+                    <li><span>Sesión B</span><strong>Ve el bloqueo</strong></li>
+                  </ol>
+                  <button class="trace-button" id="replay-match" type="button" hidden>Ver sincronización <span aria-hidden="true">↗</span></button>
+                  <p id="match-status" class="visually-hidden" role="status"></p>
+                </div>
+              </div>
+            </article>
+
+            <article class="project" id="la-fuente" aria-labelledby="la-fuente-title" tabindex="-1">
+              <div class="project-body">
+                <h3 id="la-fuente-title">La Fuente Medical Platform</h3>
+                <p class="project-type">Administración y autenticación</p>
+                <p>Rediseñé las pantallas de administración y configuración de una plataforma médica de equipo.</p>
+                <div class="case-content">
+                  <p><strong>Mi aporte.</strong> Separé secciones con rutas de carga diferida, incorporé validaciones en formularios y en la API, y guardé las preferencias del usuario. Cambié la autenticación para manejarla con cookies HttpOnly.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>Angular</li><li>FastAPI</li><li>PostgreSQL</li></ul>
+                </div>
+              </div>
+              <figure class="project-figure">
+                <div class="medical-diagram" aria-hidden="true">
+                  <div><span>Interfaz</span><strong>Acceso y preferencias</strong></div>
+                  <div><span>API</span><strong>Validación y sesión</strong></div>
+                  <div><span>Datos</span><strong>Preferencias guardadas</strong></div>
+                </div>
+                <figcaption>Esquema de la plataforma <span>Web</span></figcaption>
+              </figure>
+            </article>
+
+            <article class="project" id="gestion-del-fin" aria-labelledby="gestion-del-fin-title" tabindex="-1">
+              <div class="project-body">
+                <h3 id="gestion-del-fin-title">Gestión del Fin</h3>
+                <p class="project-type">Aprobaciones y auditoría</p>
+                <p>Implementé la aprobación de expediciones y traslados entre campamentos, con un historial para rastrear las decisiones.</p>
+                <div class="case-content">
+                  <p><strong>Mi aporte.</strong> Trabajé en el manejo de recursos y la puntuación de confianza. Contribuí pantallas en React, migraciones de base de datos y pruebas de backend para los flujos de gestión.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>React</li><li>TypeScript</li><li>FastAPI</li><li>PostgreSQL</li></ul>
+                </div>
+              </div>
+              <figure class="project-figure">
+                <ol class="flow-diagram" aria-hidden="true">
+                  <li>Solicitud</li><li>Aprobación</li><li>Historial</li>
+                </ol>
+                <figcaption>Flujo de expediciones y traslados <span>Web</span></figcaption>
+              </figure>
+            </article>
+
+            <article class="project" id="focus" aria-labelledby="focus-title" tabindex="-1">
+              <div class="project-body">
+                <h3 id="focus-title">FOCUS IDE</h3>
+                <p class="project-type">Herramientas para programar</p>
+                <p>Me encargué de la interfaz de escritorio y de la infraestructura del IDE para un lenguaje educativo.</p>
+                <div class="case-content">
+                  <p><strong>Mi aporte.</strong> Diseñé la arquitectura del editor y la navegación de la aplicación. Implementé la gestión de archivos y proyectos con PyQt6 y QScintilla.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>Python</li><li>PyQt6</li><li>QScintilla</li></ul>
+                </div>
+              </div>
+              <figure class="project-figure">
+                <div class="editor-diagram" aria-hidden="true">
+                  <div><span>Proyecto</span><i></i><i></i><i></i></div>
+                  <div><span>Editor</span><i></i><i></i><i></i><i></i></div>
+                </div>
+                <figcaption>Esquema del espacio de trabajo <span>Escritorio</span></figcaption>
+              </figure>
+            </article>
+
+            <article class="project" id="la-mancha" aria-labelledby="la-mancha-title" tabindex="-1">
+              <div class="project-body">
+                <h3 id="la-mancha-title">La Mancha · Gestor de rutas</h3>
+                <p class="project-type">Grafos y estructuras de datos</p>
+                <p>Construí una aplicación en C++ y Qt para editar y explorar una red de estaciones y rutas.</p>
+                <div class="case-content">
+                  <p><strong>Mi aporte.</strong> Implementé recorridos BFS y DFS, rutas mínimas con Dijkstra y árboles de expansión mínima con Prim y Kruskal. También trabajé en la importación, la exportación y la edición visual de los nodos.</p>
+                  <ul class="project-stack" aria-label="Tecnologías"><li>C++</li><li>Qt Widgets</li><li>Grafos</li></ul>
+                </div>
+              </div>
+              <figure class="project-figure">
+                <div class="route-diagram" aria-hidden="true">
+                  <span>Estación A</span><span>Estación B</span><span>Estación C</span><span>Estación D</span>
+                </div>
+                <figcaption>Grafo ilustrativo de estaciones <span>Escritorio</span></figcaption>
+              </figure>
+            </article>
           </div>
         </div>
 
-        <div class="projects">
-          <article class="project">
-            <img class="project-image" src="assets/vivienda.webp" width="1280" height="720" alt="Ilustración isométrica de viviendas y puntos de datos sobre un plano." loading="lazy" decoding="async">
-            <div class="project-body">
-              <p class="eyebrow project-type">Regresión lineal</p>
-              <h3>Predicción de precios de vivienda</h3>
-              <p>Estimación del precio de una vivienda según su ubicación, tamaño y número de habitaciones.</p>
-              <details class="project-details">
-                <summary><span>Ver caso</span><span class="project-toggle" aria-hidden="true"></span></summary>
-                <div class="case-content">
-                  <p>Preparé los datos para ajustar un modelo de regresión lineal múltiple en Python. Usé validación cruzada para evaluar el modelo en distintas particiones de los datos.</p>
-                  <ul class="project-stack" aria-label="Tecnologías"><li>Python</li><li>scikit-learn</li><li>Pandas</li><li>Matplotlib</li></ul>
-                </div>
-              </details>
-            </div>
-          </article>
-
-          <article class="project">
-            <img class="project-image" src="assets/cifar.webp" width="1280" height="720" alt="Ilustración de una cuadrícula de imágenes atravesada por un filtro de convolución." loading="lazy" decoding="async">
-            <div class="project-body">
-              <p class="eyebrow project-type">Red neuronal convolucional</p>
-              <h3>Clasificación de imágenes con CIFAR-10</h3>
-              <p>Una red neuronal entrenada para reconocer diez categorías de imágenes.</p>
-              <details class="project-details">
-                <summary><span>Ver caso</span><span class="project-toggle" aria-hidden="true"></span></summary>
-                <div class="case-content">
-                  <p>Entrené la red con TensorFlow y Keras. Usé aumentación de datos para exponer al modelo a variaciones de sus imágenes de entrenamiento.</p>
-                  <ul class="project-stack" aria-label="Tecnologías"><li>Python</li><li>TensorFlow</li><li>Keras</li><li>Jupyter</li></ul>
-                </div>
-              </details>
-            </div>
-          </article>
-        </div>
+        <section class="project-index" aria-labelledby="project-index-title">
+          <div class="project-index-heading">
+            <h3 id="project-index-title">También he trabajado en</h3>
+            <a href="https://github.com/samuelpicado">Perfil de GitHub <span class="arrow-diagonal" aria-hidden="true"></span></a>
+          </div>
+          <ul class="project-index-list">
+            <li>
+              <p class="project-index-tech">JavaFX · Maven · Entra ID</p>
+              <div><h4>MuniBooking</h4><p>Contribuí vistas de reservas y administración, autenticación con Microsoft Entra ID, sesiones, reportes, paginación e integración REST.</p></div>
+              <a href="https://github.com/JorgeAndresChp/MuniBooking_Frontend" aria-label="Ver el frontend de MuniBooking en GitHub">Frontend <span class="arrow-diagonal" aria-hidden="true"></span></a>
+            </li>
+            <li>
+              <p class="project-index-tech">JavaFX · TCP · Gson</p>
+              <div><h4>Reservas concurrentes de asientos</h4><p>Implementé la comunicación por TCP y la identificación de clientes. Añadí inicio de sesión y registro gestionados por el servidor, vistas de facturas, builds portables y generación de carga.</p></div>
+            </li>
+            <li>
+              <p class="project-index-tech">JavaFX · Spring Boot · Docker</p>
+              <div><h4>RAG-System</h4><p>Construí controladores, vistas y estilos JavaFX para consultar documentos. También contribuí a la configuración Docker del backend.</p></div>
+              <a href="https://github.com/Alexzm25/RAG-System" aria-label="Repositorio de RAG-System en GitHub">Repositorio <span class="arrow-diagonal" aria-hidden="true"></span></a>
+            </li>
+            <li>
+              <p class="project-index-tech">Oracle · SQL / PL/SQL</p>
+              <div><h4>SIAC</h4><p>Trabajé en procedimientos, validación de transacciones e integridad de datos en Oracle.</p></div>
+            </li>
+            <li>
+              <p class="project-index-tech">NixOS · Flakes · Home Manager</p>
+              <div><h4>NixOS dotfiles</h4><p>Mantengo la configuración de mi ThinkPad X13 y mi HP EliteBook 830 con módulos compartidos y un entorno común de Home Manager.</p></div>
+              <a href="https://github.com/samuelpicado/dotfiles" aria-label="Repositorio de NixOS dotfiles en GitHub">Repositorio <span class="arrow-diagonal" aria-hidden="true"></span></a>
+            </li>
+          </ul>
+        </section>
       </div>
     </section>
 
-    <section class="section lab" id="laboratorio" aria-labelledby="lab-title">
-      <div class="shell">
-        <div class="section-head lab-head">
-          <div>
-            <p class="eyebrow">Laboratorio interactivo</p>
-            <h2 id="lab-title">¿Cuánto ruido tolera una recta?</h2>
-          </div>
-          <p>Mueve el control para dispersar los puntos y observa cómo cambia el ajuste de la regresión lineal.</p>
-        </div>
-
-        <div class="lab-grid" id="lab-interactive" hidden>
-          <figure class="lab-chart">
-            <figcaption>Regresión lineal <span>Datos sintéticos</span></figcaption>
-            <svg id="lab-plot" role="img" viewBox="0 0 620 320" preserveAspectRatio="xMidYMid meet" aria-label="Diagrama de dispersión y recta de regresión"></svg>
-          </figure>
-          <div class="lab-console">
-            <div class="lab-controls">
-              <label for="lab-noise">Ruido de los datos</label>
-              <output for="lab-noise" id="lab-noise-value" aria-live="off">42%</output>
-              <input id="lab-noise" type="range" min="0" max="100" value="42">
-            </div>
-            <dl class="lab-metrics">
-              <div>
-                <dt>Coeficiente R²</dt>
-                <dd id="lab-r2">—</dd>
-              </div>
-              <div>
-                <dt>Error medio absoluto</dt>
-                <dd id="lab-mae">—</dd>
-              </div>
-            </dl>
-            <p id="lab-update" class="visually-hidden" role="status"></p>
-          </div>
-        </div>
-        <noscript><p>Habilita JavaScript para ajustar el ruido de los datos y ver cómo cambia la regresión.</p></noscript>
-      </div>
-    </section>
-
-    <section class="section profile" id="perfil" aria-labelledby="profile-title">
+    <section class="profile" id="perfil" aria-labelledby="profile-title">
       <div class="shell profile-grid">
         <div class="profile-copy">
-          <p class="eyebrow">Sobre mí</p>
-          <h2 id="profile-title">Samuel Picado<span class="ink-period">.</span></h2>
-          <p>Soy estudiante de tercer año de Ingeniería en Sistemas. En mis proyectos académicos he trabajado con Python, datos y modelos de aprendizaje automático. Estoy aprendiendo a llevar ese trabajo a la nube.</p>
-          <p>Busco prácticas y proyectos remotos en los que pueda seguir aprendiendo y contribuir en machine learning o ingeniería de datos.</p>
+          <h2 id="profile-title">Sobre mí</h2>
+          <p>Soy Samuel Alonso Picado Marín, estudiante de tercer año de Ingeniería en Sistemas de Información en la Universidad Nacional de Costa Rica, Sede Regional Brunca.</p>
+          <p>En mis proyectos de equipo he construido interfaces, integrado servicios y trabajado con bases de datos relacionales. Busco prácticas o mi primer puesto en desarrollo de software.</p>
+          <p class="profile-languages">Español nativo · Inglés intermedio (B1 autoevaluado)</p>
         </div>
         <div id="habilidades" class="toolkit">
-          <h3 class="eyebrow">Habilidades</h3>
+          <h3>Habilidades</h3>
           <dl>
-            <div><dt>Datos</dt><dd>Python, SQL, Pandas, NumPy</dd></div>
-            <div><dt>Machine learning</dt><dd>scikit-learn, TensorFlow, Keras</dd></div>
-            <div><dt>Exploración</dt><dd>Jupyter, Matplotlib</dd></div>
-            <div><dt>Desarrollo y nube</dt><dd>Git, GitHub, HTML, CSS, AWS S3</dd></div>
+            <div><dt>Interfaces web</dt><dd>Angular, React, TypeScript, RxJS y Taiga UI</dd></div>
+            <div><dt>Servicios y datos</dt><dd>FastAPI, SQLAlchemy, Alembic, PostgreSQL y Oracle SQL/PL/SQL</dd></div>
+            <div><dt>Escritorio y redes</dt><dd>JavaFX, Qt, PyQt6, QScintilla, sockets TCP y multihilos</dd></div>
+            <div><dt>Herramientas</dt><dd>Git, Docker Compose, Maven, pytest, Linux y NixOS</dd></div>
           </dl>
         </div>
       </div>
@@ -160,9 +269,7 @@
     <section class="contact" id="contacto" aria-labelledby="contact-title">
       <div class="shell contact-grid">
         <div>
-          <p class="eyebrow">Contacto</p>
           <h2 id="contact-title">Hablemos<span>.</span></h2>
-          <p>Si estás armando un proyecto de datos o buscas a alguien para una práctica, escríbeme.</p>
         </div>
         <div class="contact-links">
           <div class="email-row">
