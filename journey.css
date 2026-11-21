@@ -1,0 +1,74 @@
+.project-index {
+  margin-block-start: 0;
+  margin-inline-start: calc(-1 * var(--side-nav-space, 0px));
+  padding-block: clamp(3rem, 7vw, 6rem);
+  padding-inline-start: var(--side-nav-space, 0px);
+  background: var(--paper);
+}
+
+.project-index-heading h2 { font-size: clamp(1.6rem, 3vw, 2.7rem); line-height: 1.1; letter-spacing: -.025em; }
+.project-index-list h3 { font-size: 1.14rem; line-height: inherit; letter-spacing: normal; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .journey[data-journey] {
+    --journey-bottom-gutter: calc(4.2rem + env(safe-area-inset-bottom));
+    block-size: 650svh;
+    margin-inline-start: calc(-1 * var(--side-nav-space, 0px));
+  }
+
+  [data-journey] .journey-window {
+    position: sticky;
+    inset-block-start: 0;
+    block-size: 100svh;
+    overflow: clip;
+    isolation: isolate;
+    background: var(--field);
+  }
+
+  [data-journey] .journey-canvas {
+    position: absolute;
+    inset: 0 auto auto 0;
+    display: grid;
+    grid-template: repeat(3, minmax(0, 1fr)) / repeat(2, minmax(0, 1fr));
+    inline-size: 200%;
+    block-size: 300%;
+    transform-origin: 0 0;
+  }
+
+  [data-journey] [data-journey-scene] {
+    min-block-size: 0;
+    min-inline-size: 0;
+    margin: 0;
+    padding-block-end: var(--journey-bottom-gutter);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scroll-padding-block-end: var(--journey-bottom-gutter);
+  }
+
+  [data-journey] .signal-hero { grid-area: 1 / 1; }
+  [data-journey] .work { grid-area: 2 / 1; }
+  [data-journey] .project-index { grid-area: 2 / 2; }
+  [data-journey] .profile { grid-area: 3 / 2; }
+  [data-journey] .contact { grid-area: 3 / 1; }
+  [data-journey] .reel-exit > span { rotate: -45deg; }
+
+  [data-journey] .work {
+    --journey-reel-height: clamp(25rem, 74svh, 37rem);
+    padding-block-end: max(var(--journey-bottom-gutter), calc((100svh - var(--journey-reel-height)) / 2));
+  }
+
+  [data-journey] .project-stage:has(#project-carousel[data-ready]) { --reel-height: var(--journey-reel-height); }
+
+  [data-journey] :is(.project-index, .profile, .contact) {
+    display: grid;
+    align-content: safe center;
+  }
+}
+
+@media (min-width: 57rem) and (min-height: 42rem) and (prefers-reduced-motion: no-preference) {
+  [data-journey] .work {
+    --journey-reel-height: clamp(38rem, 68svh, 48rem);
+    padding-block-start: clamp(1.35rem, 4svh, 3.5rem);
+  }
+}

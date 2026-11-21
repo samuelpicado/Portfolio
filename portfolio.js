@@ -1,3 +1,5 @@
+import { goToJourneyTarget } from './journey.js';
+
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
 function setupContact() {
@@ -228,12 +230,15 @@ function setupProjects() {
   };
 
   const projectAt = hash => projects.find(card => '#' + card.id === hash);
+  const journeyIsActive = () => document.getElementById('inicio').hasAttribute('data-journey');
 
-  const centerProject = (project, behavior) => {
-    carousel.scrollIntoView({ block: 'center', inline: 'nearest', behavior });
+  const centerProject = (project, behavior, focus = true) => {
+    if (!goToJourneyTarget(carousel, behavior, { center: true })) {
+      carousel.scrollIntoView({ block: 'center', inline: 'nearest', behavior });
+    }
     const wrapsForward = behavior === 'smooth' && current === projectCount - 1 && project === projects[0];
     scrollToCard(wrapsForward ? after[0] : project, behavior);
-    project.focus({ preventScroll: true });
+    if (focus) project.focus({ preventScroll: true });
   };
 
   const goTo = (index) => {
@@ -246,9 +251,10 @@ function setupProjects() {
     scrollToCard(destination, motion ? 'smooth' : 'instant');
   };
 
-  document.querySelector('.case-nav')?.addEventListener('click', (event) => {
+  document.addEventListener('click', (event) => {
     const link = event.target.closest('a[data-case-link]');
     if (!link || event.defaultPrevented || event.button !== 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (!link.closest('.case-nav') && !journeyIsActive()) return;
     const project = projectAt(link.hash);
     if (!project) return;
 
@@ -262,9 +268,12 @@ function setupProjects() {
   });
 
   window.addEventListener('popstate', (event) => {
-    const project = projectAt(location.hash);
-    if (project && project.id === event.state?.reelCase) {
-      requestAnimationFrame(() => centerProject(project, 'instant'));
+    const hash = location.hash;
+    const project = projectAt(hash);
+    if (project && (journeyIsActive() || project.id === event.state?.reelCase)) {
+      requestAnimationFrame(() => {
+        if (location.hash === hash) centerProject(project, 'instant');
+      });
     }
   });
 
@@ -275,7 +284,8 @@ function setupProjects() {
   controls.hidden = false;
   const linkedProject = projectAt(location.hash);
   if (linkedProject) {
-    linkedProject.scrollIntoView({ block: carouselLayout.matches ? 'center' : 'start', behavior: 'instant' });
+    if (journeyIsActive()) centerProject(linkedProject, 'instant', false);
+    else linkedProject.scrollIntoView({ block: carouselLayout.matches ? 'center' : 'start', behavior: 'instant' });
   } else {
     scrollToCard(projects[0], 'instant');
   }

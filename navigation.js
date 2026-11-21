@@ -100,7 +100,9 @@ function positionGlider(animate = false) {
 function updateRoute() {
   frame = 0;
   const atEnd = scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
-  const route = atEnd ? routes.at(-1) : routes.findLast(({ section }) => section.getBoundingClientRect().top <= innerHeight * .42);
+  const scene = document.getElementById('inicio').dataset.journeyCurrent;
+  const route = scene ? routes.find(({ link }) => link.hash === '#' + (scene === 'mas-proyectos' ? 'proyectos' : scene))
+    : atEnd ? routes.at(-1) : routes.findLast(({ section }) => section.getBoundingClientRect().top <= innerHeight * .42);
   if (!route || route.link === activeLink) return;
   activeLink?.removeAttribute('aria-current');
   activeLink = route.link;
@@ -117,6 +119,7 @@ positionGlider();
 disclosure.addEventListener('toggle', () => positionGlider());
 motion.addEventListener('change', () => positionGlider());
 window.addEventListener('scroll', scheduleRoute, { passive: true });
+document.addEventListener('journey:scenechange', scheduleRoute);
 window.addEventListener('resize', () => {
   positionGlider();
   scheduleRoute();
