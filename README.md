@@ -21,8 +21,9 @@ La portada toma como referencia la jerarquía de [Daniel Ingrassia](https://ingr
 ## Contenido
 
 - `index.html` contiene el mapa, los casos, el catálogo completo, el perfil y el contacto. Cada caso destacado tiene un enlace directo.
-- `styles.css` contiene los temas y el recorrido con desplazamiento vertical nativo. En pantallas pequeñas los casos siguen el flujo de lectura normal.
-- `portfolio.js` sincroniza los enlaces del mapa con el caso visible, guarda el tema y añade la secuencia de Mahjong y la copia del correo. Los casos y los enlaces están disponibles sin JavaScript.
+- `styles.css` contiene los temas, el marco fijo del carrusel y su perspectiva. En pantallas pequeñas los casos siguen el flujo de lectura normal.
+- `case-art.css` presenta los esquemas de los casos y sus secuencias breves de entrada.
+- `portfolio.js` calcula la profundidad a partir del desplazamiento nativo, sincroniza el mapa con el caso visible, guarda el tema y añade la secuencia de Mahjong y la copia del correo. Los casos y los enlaces están disponibles sin JavaScript.
 - `assets/mahjong.webp` es la captura original de una partida local con dos jugadores ficticios. La secuencia de tres pasos explica el mecanismo de sincronización.
 
 Los casos se redactaron a partir de ambos CV y del [perfil de GitHub](https://github.com/samuelpicado). El índice enlaza al código cuando se pudo verificar que el repositorio es público. La investigación y el crédito del diseño académico original se conservan abajo.

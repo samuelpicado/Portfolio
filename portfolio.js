@@ -84,7 +84,8 @@ function setupProjects() {
   const controls = document.querySelector('.project-controls');
   const position = document.querySelector('#project-position');
   const status = document.querySelector('#project-status');
-  if (!carousel || !controls || !position || !status) return;
+  const reelTitle = document.querySelector('#reel-title');
+  if (!carousel || !controls || !position || !status || !reelTitle) return;
 
   const projects = [...carousel.children].filter((child) => child.matches('.project'));
   if (!projects.length) return;
@@ -98,6 +99,8 @@ function setupProjects() {
 
   const setCurrent = (index) => {
     if (index === current) return;
+    const direction = Math.sign(index - current);
+    const firstSelection = current < 0;
     projects[current]?.removeAttribute('data-current');
     current = index;
     projects[index].setAttribute('data-current', '');
@@ -108,23 +111,44 @@ function setupProjects() {
     position.textContent = `${String(index + 1).padStart(2, '0')} / ${String(projects.length).padStart(2, '0')}`;
     previous?.setAttribute('aria-disabled', String(index === 0));
     next?.setAttribute('aria-disabled', String(index === projects.length - 1));
+
+    reelTitle.textContent = projects[index].querySelector('h3').textContent;
+    if (!firstSelection && carouselLayout.matches && !reducedMotion.matches) {
+      reelTitle.getAnimations().forEach(animation => animation.cancel());
+      reelTitle.animate([
+        { translate: `${direction * 7}% 0`, opacity: 0 },
+        { translate: '0 0', opacity: 1 },
+      ], { duration: 520, easing: 'cubic-bezier(.19, 1, .22, 1)' });
+    }
   };
 
   const trackCurrent = () => {
     frame = 0;
-    const guide = carouselLayout.matches
-      ? carousel.getBoundingClientRect().top + carousel.clientHeight * 0.45
-      : innerHeight * 0.45;
+    const desktop = carouselLayout.matches;
+    const scrollHeight = desktop ? carousel.clientHeight : innerHeight;
+    const guide = desktop
+      ? carousel.getBoundingClientRect().top + carousel.clientTop + scrollHeight / 2
+      : scrollHeight * 0.45;
+    const animateDepth = desktop && !reducedMotion.matches;
+    const bounds = projects.map(project => project.getBoundingClientRect());
+    const progress = desktop ? carousel.scrollTop / Math.max(1, carousel.scrollHeight - scrollHeight) : 0;
+
     let best = Infinity;
     let active = 0;
-    projects.forEach((project, index) => {
-      const { top, bottom } = project.getBoundingClientRect();
-      const distance = Math.max(top - guide, guide - bottom, 0);
+    bounds.forEach(({ top, height, bottom }, index) => {
+      const offset = top + height / 2 - guide;
+      const distance = desktop ? Math.abs(offset) : Math.max(top - guide, guide - bottom, 0);
+      if (animateDepth) {
+        const depth = Math.max(-1, Math.min(1, offset / (scrollHeight * 0.75)));
+        projects[index].style.setProperty('--reel-offset', depth.toFixed(3));
+        projects[index].style.setProperty('--reel-distance', Math.abs(depth).toFixed(3));
+      }
       if (distance < best) {
         best = distance;
         active = index;
       }
     });
+    controls.style.setProperty('--reel-progress', String(Math.max(0, Math.min(1, progress))));
     setCurrent(active);
   };
 
@@ -141,15 +165,18 @@ function setupProjects() {
       project.scrollIntoView({ block: 'start', behavior });
       return;
     }
-    const offset = project.getBoundingClientRect().top - carousel.getBoundingClientRect().top;
-    carousel.scrollTo({ top: carousel.scrollTop + offset - carousel.clientTop, behavior });
+    const bounds = project.getBoundingClientRect();
+    const offset = bounds.top - carousel.getBoundingClientRect().top - carousel.clientTop;
+    const center = offset + (bounds.height - carousel.clientHeight) / 2;
+    carousel.scrollTo({ top: carousel.scrollTop + center, behavior });
   };
 
   carousel.dataset.ready = '';
   controls.hidden = false;
   const linkedProject = projects.findIndex(({ id }) => '#' + id === location.hash);
   if (linkedProject >= 0) {
-    projects[linkedProject].scrollIntoView({ block: 'start', behavior: 'instant' });
+    const block = carouselLayout.matches ? 'center' : 'start';
+    projects[linkedProject].scrollIntoView({ block, behavior: 'instant' });
   }
   trackCurrent();
   carousel.addEventListener('scroll', scheduleTracking, { passive: true });
@@ -157,6 +184,10 @@ function setupProjects() {
     if (!carouselLayout.matches) scheduleTracking();
   }, { passive: true });
   window.addEventListener('resize', scheduleTracking, { passive: true });
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) reelTitle.getAnimations().forEach(animation => animation.cancel());
+    scheduleTracking();
+  });
   previous?.addEventListener('click', () => goTo(current - 1));
   next?.addEventListener('click', () => goTo(current + 1));
   carousel.addEventListener('keydown', (event) => {
