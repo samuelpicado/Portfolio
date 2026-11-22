@@ -7,15 +7,17 @@ function setupWelcome() {
   if (location.hash) return;
 
   const dialog = document.getElementById('portfolio-welcome');
-  if (typeof dialog?.showModal !== 'function') return;
+  if (typeof dialog?.showModal !== 'function' || typeof ResizeObserver !== 'function') return;
   const enter = dialog.querySelector('#welcome-enter');
   const letter = dialog.querySelector('.welcome-letter-o');
   const home = document.getElementById('inicio');
   const canvas = dialog.querySelector('.welcome-light');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const aperture = 'radial-gradient(transparent, black)';
+  const canReveal = CSS.supports('mask-image', aperture) || CSS.supports('-webkit-mask-image', aperture);
   const lifetime = new AbortController();
   const { signal } = lifetime;
-  const recordingBytes = reducedMotion.matches ? undefined : loadWelcomeSound(signal);
+  const recordingBytes = !canReveal || reducedMotion.matches ? undefined : loadWelcomeSound(signal);
   let portal;
   let tunnel;
   let release;
@@ -97,6 +99,7 @@ function setupWelcome() {
     lifetime.abort();
     releaseLight();
     dialog.close();
+    delete document.documentElement.dataset.welcomeOpen;
     delete dialog.dataset.lit;
     if (focusHome) {
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -107,7 +110,7 @@ function setupWelcome() {
   function enterPortfolio() {
     if (closing) return;
     closing = true;
-    if (reducedMotion.matches) {
+    if (reducedMotion.matches || !canReveal) {
       close(true);
       return;
     }
@@ -167,6 +170,7 @@ function setupWelcome() {
 
   dialog.dataset.loading = '';
   dialog.showModal();
+  document.documentElement.dataset.welcomeOpen = '';
   tunnel = mountWelcomeTunnel(dialog.querySelector('.welcome-tunnel'));
   updateGeometry();
   const geometry = new ResizeObserver(updateGeometry);

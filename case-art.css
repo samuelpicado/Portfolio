@@ -319,3 +319,18 @@
 @keyframes case-stage-in { from { translate: .65rem 0; } }
 @keyframes case-editor-in { from { scale: .96; translate: 0 .4rem; } }
 @keyframes case-route-in { from { clip-path: inset(0 86% 0 0); } to { clip-path: inset(0); } }
+
+@supports not (color: light-dark(white, black)) {
+  .case-art:is(.case-art-medical, .case-art-expedition, .case-art-route) {
+    --art-paper: var(--paper);
+    --art-ink: var(--ink);
+    --art-rule: var(--line);
+    --art-pulse: var(--accent);
+    --art-glass: var(--surface);
+  }
+
+  .case-art.case-art-editor {
+    --art-paper: var(--paper);
+    --art-rule: var(--line);
+  }
+}

@@ -31,6 +31,21 @@
 :root[data-theme="light"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 
+@supports not (color: light-dark(white, black)) {
+  :root {
+    --paper: Canvas;
+    --surface: ButtonFace;
+    --field: Canvas;
+    --ink: CanvasText;
+    --muted: CanvasText;
+    --line: GrayText;
+    --accent: LinkText;
+    --accent-ink: Canvas;
+    --accent-wash: ButtonFace;
+    --signal: VisitedText;
+  }
+}
+
 *, *::before, *::after { box-sizing: border-box; }
 
 body {

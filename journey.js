@@ -8,7 +8,7 @@ export function buildJourneyPath(width, height) {
   let length = 0;
 
   const addPoint = (x, y) => {
-    const previous = points.at(-1);
+    const previous = points[points.length - 1];
     if (previous) length += Math.hypot(x - previous.x, y - previous.y);
     points.push({ x, y, length });
   };
@@ -58,6 +58,10 @@ export function buildJourneyPath(width, height) {
 
 let activeJourney;
 
+export function supportsReelLayout() {
+  return CSS.supports('height', '100svh') && CSS.supports('selector(:has(*))');
+}
+
 export function goToJourneyTarget(target, behavior, { center = false } = {}) {
   return activeJourney?.goTo(target, behavior, center) ?? false;
 }
@@ -103,8 +107,9 @@ function mountJourney(runway, viewport, canvas, scenes) {
       pose = transform;
     }
 
-    sceneIndex = path.checkpoints.findLastIndex((checkpoint, index) => index === 0 ||
-      displayed >= (path.checkpoints[index - 1] + checkpoint) / 2);
+    const next = path.checkpoints.findIndex((checkpoint, index) => index > 0 &&
+      displayed < (path.checkpoints[index - 1] + checkpoint) / 2);
+    sceneIndex = next < 0 ? scenes.length - 1 : next - 1;
     const current = scenes[sceneIndex].id || runway.id;
     if (runway.dataset.journeyCurrent !== current) {
       runway.dataset.journeyCurrent = current;
@@ -247,7 +252,8 @@ function setupJourney() {
   const viewport = runway?.querySelector('.journey-window');
   const canvas = viewport?.querySelector('.journey-canvas');
   const scenes = [...canvas?.querySelectorAll(':scope > [data-journey-scene]') ?? []];
-  if (scenes.length !== 5 || !('ResizeObserver' in window) || !('IntersectionObserver' in window)) return;
+  if (scenes.length !== 5 || !supportsReelLayout() || !CSS.supports('overflow', 'clip') ||
+      typeof ResizeObserver !== 'function' || typeof IntersectionObserver !== 'function') return;
 
   const motion = matchMedia('(prefers-reduced-motion: no-preference)');
   const sync = () => {

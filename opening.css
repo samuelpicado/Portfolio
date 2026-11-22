@@ -161,6 +161,20 @@
 
 .opening-route:nth-child(2) { --branch: light-dark(#a0473b, #ff9d8d); }
 .opening-route:nth-child(3) { --branch: light-dark(#216f63, #8ce7c7); }
+
+@supports not (color: light-dark(white, black)) {
+  .signal-hero {
+    --opening-paper: var(--paper);
+    --opening-ink: var(--ink);
+    --opening-quiet: var(--muted);
+    --opening-rule: var(--line);
+    --opening-accent: var(--accent);
+    background: var(--field);
+  }
+
+  .opening-route:nth-child(n) { --branch: var(--accent); }
+}
+
 .opening-route:first-child { border-inline-start: 0; padding-inline-start: 0; }
 
 .opening-route > p {

@@ -2,6 +2,7 @@
   position: fixed;
   inset: 0;
   inline-size: 100%;
+  block-size: 100vh;
   block-size: 100dvh;
   max-inline-size: none;
   max-block-size: none;
@@ -17,7 +18,7 @@
 
 #portfolio-welcome:not([open]) { display: none; }
 #portfolio-welcome::backdrop { background: transparent; }
-:root:has(#portfolio-welcome:modal) { overflow: hidden; }
+:root[data-welcome-open] { overflow: hidden; }
 :root:has(#portfolio-welcome:modal:not([data-crossing])) .opening-name span { animation-play-state: paused; }
 
 .welcome-art,
@@ -58,6 +59,7 @@
 }
 
 .welcome-word {
+  font-size: min(42vh, 19vw);
   font-size: min(42dvh, 19vw);
   font-weight: 500;
   line-height: 1;
@@ -70,6 +72,7 @@
 
 #portfolio-welcome[data-crossing] { background: transparent; }
 #portfolio-welcome[data-crossing] .welcome-art {
+  -webkit-mask-image: radial-gradient(ellipse var(--welcome-aperture), transparent 98%, #000 100%);
   mask-image: radial-gradient(ellipse var(--welcome-aperture), transparent 98%, #000 100%);
 }
 #portfolio-welcome[data-crossing] .welcome-tunnel { visibility: visible; }

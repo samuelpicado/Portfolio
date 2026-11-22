@@ -29,7 +29,7 @@
   box-shadow: 0 .55rem 1.55rem var(--glass-depth);
 }
 
-@supports (backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px)) {
+@supports (color: color-mix(in srgb, black, white)) and ((backdrop-filter: blur(12px)) or (-webkit-backdrop-filter: blur(12px))) {
   .side-nav-trigger, .side-nav-panel {
     isolation: isolate;
     border-color: color-mix(in srgb, var(--glass-edge) 55%, transparent);
@@ -74,6 +74,10 @@
       inset -2px 0 3px color-mix(in srgb, var(--glass-glint) 30%, transparent);
     pointer-events: none;
   }
+}
+
+@supports not (color: light-dark(white, black)) {
+  .side-nav-trigger, .side-nav-panel { background: var(--surface); }
 }
 
 .side-nav-trigger {

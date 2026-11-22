@@ -102,7 +102,8 @@ function updateRoute() {
   const atEnd = scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
   const scene = document.getElementById('inicio').dataset.journeyCurrent;
   const route = scene ? routes.find(({ link }) => link.hash === '#' + (scene === 'mas-proyectos' ? 'proyectos' : scene))
-    : atEnd ? routes.at(-1) : routes.findLast(({ section }) => section.getBoundingClientRect().top <= innerHeight * .42);
+    : atEnd ? routes[routes.length - 1]
+    : routes.reduce((visible, entry) => entry.section.getBoundingClientRect().top <= innerHeight * .42 ? entry : visible, null);
   if (!route || route.link === activeLink) return;
   activeLink?.removeAttribute('aria-current');
   activeLink = route.link;

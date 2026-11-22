@@ -20,7 +20,7 @@ function fitCanvas(canvas, context, width, height) {
 function setupOpeningPoints() {
   const canvas = document.querySelector('#opening-points');
   const context = canvas?.getContext('2d');
-  if (!context) return;
+  if (!context || typeof ResizeObserver !== 'function' || typeof IntersectionObserver !== 'function') return;
 
   const hero = canvas.parentElement;
   let points = [];
@@ -192,7 +192,7 @@ function setupSignalField() {
     });
     return { t, color, points, routeVertex: ring === routes[color].ring ? routes[color].vertex : -1 };
   });
-  const rightmost = Math.max(...contours.at(-1).points.map(([x]) => x));
+  const rightmost = Math.max(...contours[contours.length - 1].points.map(([x]) => x));
   let pointer;
   let hovered = -1;
   let focused = -1;
@@ -295,7 +295,7 @@ function setupSignalField() {
   map.addEventListener('pointerleave', () => { hovered = -1; schedulePaint(); });
   map.addEventListener('focusin', (event) => { focused = branchFor(event.target); schedulePaint(); });
   map.addEventListener('focusout', (event) => { focused = branchFor(event.relatedTarget); schedulePaint(); });
-  new ResizeObserver(schedulePaint).observe(plate);
+  if (typeof ResizeObserver === 'function') new ResizeObserver(schedulePaint).observe(plate);
   new MutationObserver(schedulePaint).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   systemDark.addEventListener('change', schedulePaint);
   reducedMotion.addEventListener('change', schedulePaint);
@@ -370,7 +370,7 @@ function setupCursorSignal() {
 
   document.addEventListener('pointermove', (event) => {
     if (reducedMotion.matches || !['mouse', 'pen'].includes(event.pointerType)) return;
-    const last = points.at(-1);
+    const last = points[points.length - 1];
     if (last && Math.hypot(event.clientX - last.x, event.clientY - last.y) < 3) return;
     points.push({
       x: event.clientX, y: event.clientY, time: performance.now(),

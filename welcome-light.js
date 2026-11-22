@@ -191,7 +191,8 @@ function makeMask(width, height) {
   const glyph = createContext();
   const tint = createContext();
   const mask = createContext();
-  if (!glyph || !tint || !mask || !('filter' in mask)) return null;
+  if (!glyph || !tint || !mask) return null;
+  const canvasFilters = 'filter' in mask;
 
   const { baseline } = layoutWelcomeWord(glyph, width, height);
   glyph.fillStyle = '#fff';
@@ -200,14 +201,25 @@ function makeMask(width, height) {
   mask.fillStyle = '#000';
   mask.fillRect(0, 0, width, height);
   mask.globalCompositeOperation = 'lighter';
-  for (const [color, blur] of [['#f00', 0], ['#0f0', .006], ['#00f', .03]]) {
+  for (const [color, amount] of [['#f00', 0], ['#0f0', .006], ['#00f', .03]]) {
+    const blur = height * amount;
+    if (blur && !canvasFilters) {
+      // Draw the source outside the mask so only its blurred shadow lands in the channel.
+      mask.save();
+      mask.shadowColor = color;
+      mask.shadowBlur = blur * 2;
+      mask.shadowOffsetX = width;
+      mask.drawImage(glyph.canvas, -width, 0);
+      mask.restore();
+      continue;
+    }
     tint.clearRect(0, 0, width, height);
     tint.drawImage(glyph.canvas, 0, 0);
     tint.globalCompositeOperation = 'source-in';
     tint.fillStyle = color;
     tint.fillRect(0, 0, width, height);
     tint.globalCompositeOperation = 'source-over';
-    mask.filter = blur ? `blur(${height * blur}px)` : 'none';
+    if (canvasFilters) mask.filter = blur ? `blur(${blur}px)` : 'none';
     mask.drawImage(tint.canvas, 0, 0);
   }
 

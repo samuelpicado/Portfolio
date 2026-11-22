@@ -1,4 +1,4 @@
-import { goToJourneyTarget } from './journey.js';
+import { goToJourneyTarget, supportsReelLayout } from './journey.js';
 
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
@@ -88,7 +88,7 @@ function setupProjects() {
   const position = document.querySelector('#project-position');
   const status = document.querySelector('#project-status');
   const reelTitle = document.querySelector('#reel-title');
-  if (!track || !controls || !position || !status || !reelTitle) return;
+  if (!track || !controls || !position || !status || !reelTitle || !supportsReelLayout()) return;
 
   const projects = [...track.children];
   if (projects.length < 2) return;
@@ -120,6 +120,7 @@ function setupProjects() {
   let lastScroll = 0;
   let direction = 1;
   let previousProgress = 0;
+  let pendingCard;
 
   const fitTitle = () => {
     const { offsetWidth } = reelTitle;
@@ -189,6 +190,9 @@ function setupProjects() {
     const pastStart = desktop ? guide < lastCopy + 1 : guide < first - 2;
     const pastEnd = guide >= firstCopy - 1;
     if (settled && (pastStart || pastEnd)) {
+      // An interrupted scroll can deliver its scrollend after the next key has been pressed.
+      if (pendingCard && Math.abs(getStop(pendingCard.getBoundingClientRect(), desktop) - guide) > 2) return;
+      pendingCard = undefined;
       const shift = pastEnd ? first - firstCopy : desktop ? last - lastCopy : firstCopy - first;
       lastScroll = scroll + shift;
       carousel.dataset.recentering = '';
@@ -199,6 +203,7 @@ function setupProjects() {
       });
       return;
     }
+    if (settled) pendingCard = undefined;
 
     let best = Infinity;
     let active = 0;
@@ -226,7 +231,24 @@ function setupProjects() {
   const scrollToCard = (card, behavior) => {
     const desktop = carouselLayout.matches;
     const offset = getStop(card.getBoundingClientRect(), desktop) - getGuide(desktop);
+    pendingCard = behavior === 'smooth' && Math.abs(offset) > 2 ? card : undefined;
     carousel.scrollTo({ top: carousel.scrollTop + offset, behavior });
+  };
+
+  const nearestCopy = (project) => {
+    const desktop = carouselLayout.matches;
+    const guide = getGuide(desktop);
+    let nearest = project;
+    let best = Infinity;
+    for (const card of cards) {
+      if (card.dataset.reelCase !== project.id) continue;
+      const distance = Math.abs(getStop(card.getBoundingClientRect(), desktop) - guide);
+      if (distance < best) {
+        best = distance;
+        nearest = card;
+      }
+    }
+    return nearest;
   };
 
   const projectAt = hash => projects.find(card => '#' + card.id === hash);
@@ -237,17 +259,16 @@ function setupProjects() {
       carousel.scrollIntoView({ block: 'center', inline: 'nearest', behavior });
     }
     const wrapsForward = behavior === 'smooth' && current === projectCount - 1 && project === projects[0];
-    scrollToCard(wrapsForward ? after[0] : project, behavior);
+    scrollToCard(wrapsForward ? nearestCopy(project) : project, behavior);
     if (focus) project.focus({ preventScroll: true });
   };
 
-  const goTo = (index) => {
+  const goTo = (index, adjacent) => {
     const target = (index + projectCount) % projectCount;
     if (target === current) return;
     status.textContent = `Caso ${target + 1} de ${projectCount}: ${titles[target]}`;
     const motion = !reducedMotion.matches;
-    const destination = motion && index === -1 ? before.at(-1)
-      : motion && index === projectCount ? after[0] : projects[target];
+    const destination = motion && adjacent ? nearestCopy(projects[target]) : projects[target];
     scrollToCard(destination, motion ? 'smooth' : 'instant');
   };
 
@@ -300,6 +321,9 @@ function setupProjects() {
     }
   }, { passive: true });
   if (hasScrollEnd) carousel.addEventListener('scrollend', () => trackCurrent(true));
+  const clearPendingCard = () => { pendingCard = undefined; };
+  carousel.addEventListener('wheel', clearPendingCard, { passive: true });
+  carousel.addEventListener('pointerdown', clearPendingCard, { passive: true });
   window.addEventListener('resize', () => {
     fitTitle();
     scheduleTracking();
@@ -321,9 +345,9 @@ function setupProjects() {
   carousel.addEventListener('keydown', (event) => {
     if (event.target !== carousel || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     const targets = { ArrowUp: current - 1, ArrowDown: current + 1, Home: 0, End: projectCount - 1 };
-    if (!Object.hasOwn(targets, event.key)) return;
+    if (!Object.prototype.hasOwnProperty.call(targets, event.key)) return;
     event.preventDefault();
-    goTo(targets[event.key]);
+    goTo(targets[event.key], event.key === 'ArrowUp' || event.key === 'ArrowDown');
   });
 }
 
