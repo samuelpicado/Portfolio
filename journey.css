@@ -12,7 +12,7 @@
 @media (prefers-reduced-motion: no-preference) {
   .journey[data-journey] {
     --journey-bottom-gutter: calc(4.2rem + env(safe-area-inset-bottom));
-    block-size: 650svh;
+    block-size: 720svh;
     margin-inline-start: calc(-1 * var(--side-nav-space, 0px));
   }
 

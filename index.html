@@ -28,10 +28,15 @@
 <body>
   <dialog id="portfolio-welcome" aria-labelledby="welcome-title">
     <h1 id="welcome-title" class="visually-hidden" lang="en" tabindex="-1" autofocus>Welcome</h1>
-    <canvas class="welcome-light" aria-hidden="true"></canvas>
-    <button id="welcome-enter" type="button" aria-label="Entrar al portafolio">
-      <span class="welcome-word" aria-hidden="true">WELCOME</span>
-    </button>
+    <div class="welcome-art" aria-hidden="true">
+      <div class="welcome-plate">
+        <span class="welcome-word">WELC<span class="welcome-letter-o">O</span>ME</span>
+        <canvas class="welcome-light"></canvas>
+        <canvas class="welcome-portal"></canvas>
+      </div>
+    </div>
+    <canvas class="welcome-tunnel" aria-hidden="true"></canvas>
+    <button id="welcome-enter" type="button" aria-label="Entrar al portafolio"></button>
   </dialog>
   <a class="skip-link" href="#inicio">Saltar al contenido</a>
 

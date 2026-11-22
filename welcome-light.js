@@ -121,6 +121,18 @@ const word = 'WELCOME';
 const font = '500 48px Bricolage';
 const noiseSize = 64;
 
+export function layoutWelcomeWord(context, width, height) {
+  context.font = font;
+  context.letterSpacing = '0px';
+  const referenceWidth = context.measureText(word).width;
+  const fontSize = Math.min(height * .42, width * .34, width * .91 * 48 / referenceWidth);
+  context.font = `500 ${fontSize}px Bricolage, sans-serif`;
+  context.letterSpacing = `${fontSize * -.02}px`;
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  return { word, fontSize, baseline: height * .5 + fontSize * .04 };
+}
+
 function createProgram(gl, fragmentSource) {
   const program = gl.createProgram();
   if (!program) return null;
@@ -181,15 +193,8 @@ function makeMask(width, height) {
   const mask = createContext();
   if (!glyph || !tint || !mask || !('filter' in mask)) return null;
 
-  glyph.font = font;
-  const referenceWidth = glyph.measureText(word).width;
-  const fontSize = Math.min(height * .42, width * .34, width * .91 * 48 / referenceWidth);
-  glyph.font = `500 ${fontSize}px Bricolage, sans-serif`;
-  glyph.letterSpacing = `${fontSize * -.02}px`;
-  glyph.textAlign = 'center';
-  glyph.textBaseline = 'middle';
+  const { baseline } = layoutWelcomeWord(glyph, width, height);
   glyph.fillStyle = '#fff';
-  const baseline = height * .5 + fontSize * .04;
   glyph.fillText(word, width * .5, baseline);
 
   mask.fillStyle = '#000';
@@ -215,7 +220,7 @@ function makeMask(width, height) {
   };
 }
 
-export async function startWelcomeLight(canvas, { signal } = {}) {
+export async function startWelcomeLight(canvas, { signal, onReveal } = {}) {
   if (signal?.aborted || typeof ResizeObserver === 'undefined') return null;
   try {
     await document.fonts.load(font, word);
@@ -379,8 +384,10 @@ export async function startWelcomeLight(canvas, { signal } = {}) {
     gl.useProgram(program);
     gl.uniform2f(uniforms.uLight, lightX, lightY);
     gl.uniform1f(uniforms.uTime, elapsed);
-    gl.uniform1f(uniforms.uReveal, reduced ? 1 : Math.min(1, elapsed / 1.6) ** 2);
+    const reveal = reduced ? 1 : Math.min(1, elapsed / 1.6) ** 2;
+    gl.uniform1f(uniforms.uReveal, reveal);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
+    onReveal?.(reveal);
   }
 
   function tick(now) {

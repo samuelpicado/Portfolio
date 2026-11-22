@@ -12,14 +12,17 @@
   background: #010101;
   color: #ede4d7;
   color-scheme: dark;
+  touch-action: pinch-zoom;
 }
 
 #portfolio-welcome:not([open]) { display: none; }
 #portfolio-welcome::backdrop { background: transparent; }
 :root:has(#portfolio-welcome:modal) { overflow: hidden; }
-:root:has(#portfolio-welcome:modal) .opening-name span { animation-play-state: paused; }
+:root:has(#portfolio-welcome:modal:not([data-crossing])) .opening-name span { animation-play-state: paused; }
 
-.welcome-light,
+.welcome-art,
+.welcome-plate,
+#portfolio-welcome canvas,
 #welcome-enter {
   position: absolute;
   inset: 0;
@@ -27,23 +30,31 @@
   block-size: 100%;
 }
 
+.welcome-art { background: #010101; }
+.welcome-plate { display: grid; place-items: center; }
+#portfolio-welcome canvas { pointer-events: none; }
+
 .welcome-light {
   visibility: hidden;
-  pointer-events: none;
 }
 
 #welcome-enter {
-  display: grid;
-  place-items: center;
   padding: 0;
   border: 0;
   background: transparent;
-  touch-action: pinch-zoom;
+}
+
+#portfolio-welcome[data-portal] #welcome-enter {
+  inset: var(--welcome-portal-y) auto auto var(--welcome-portal-x);
+  inline-size: max(44px, var(--welcome-portal-width));
+  block-size: max(44px, var(--welcome-portal-height));
+  translate: -50% -50%;
+  border-radius: 50%;
 }
 
 #welcome-enter:focus-visible {
   outline: 1px solid #e3c9aa;
-  outline-offset: -.5rem;
+  outline-offset: 4px;
 }
 
 .welcome-word {
@@ -54,7 +65,15 @@
 }
 
 #portfolio-welcome[data-lit] .welcome-light { visibility: visible; }
-#portfolio-welcome[data-lit] .welcome-word { visibility: hidden; }
+#portfolio-welcome:is([data-lit], [data-portal-text]) .welcome-word { visibility: hidden; }
+.welcome-tunnel { visibility: hidden; }
+
+#portfolio-welcome[data-crossing] { background: transparent; }
+#portfolio-welcome[data-crossing] .welcome-art {
+  mask-image: radial-gradient(ellipse var(--welcome-aperture), transparent 98%, #000 100%);
+}
+#portfolio-welcome[data-crossing] .welcome-tunnel { visibility: visible; }
+#portfolio-welcome[data-crossing] #welcome-enter { pointer-events: none; }
 
 @media (prefers-reduced-motion: no-preference) {
   #portfolio-welcome[data-loading] .welcome-word { visibility: hidden; }
