@@ -8,6 +8,10 @@ function ease(start, end, time) {
   return t ** 3 * (t * (6 * t - 15) + 10);
 }
 
+const approachAt = time => ease(.69, 1.92, time);
+const arrivalAt = time => ease(1.66, flightDuration, time);
+const cameraZoom = (approach, arrival) => mix(mix(.18, .33, approach), 1, arrival);
+
 export const flightDuration = 3.35;
 
 export function playWelcomeFlight({ dialog, home, portal, tunnel, target, startedAt, drawPortal, darken, finish, signal }) {
@@ -28,8 +32,9 @@ export function playWelcomeFlight({ dialog, home, portal, tunnel, target, starte
     const y = mix(origin.y, height / 2, center);
     const roll = .22 * ease(.28, 1.42, time) + .45 * ease(.55, 2.02, time);
     const iris = ease(.24, .75, time);
-    const approach = ease(.69, 1.92, time);
-    const arrival = ease(1.66, flightDuration, time);
+    const approach = approachAt(time);
+    const arrival = arrivalAt(time);
+    const zoom = cameraZoom(approach, arrival);
     const fill = Math.hypot(Math.max(x, width - x), Math.max(y, height - y)) + 12;
     const distantWidth = mix(origin.rx, Math.min(width, height) * .13, approach);
     const distantHeight = mix(origin.ry, distantWidth, approach);
@@ -44,8 +49,7 @@ export function playWelcomeFlight({ dialog, home, portal, tunnel, target, starte
     plate.style.opacity = veil;
 
     // Keep the live page behind the aperture, framed on the name as the camera approaches.
-    const distantScale = mix(.18, .33, approach);
-    const scale = Math.min(1, Math.max(mix(distantScale, 1, arrival), 2 * rx / width, 2 * ry / height));
+    const scale = Math.min(1, Math.max(zoom, 2 * rx / width, 2 * ry / height));
     const shift = (center, focus, size, radius) => {
       const margin = Math.max(0, size * scale / 2 - radius);
       const offset = Math.min(margin, Math.max(-margin, (.5 - focus) * size * scale));
@@ -61,10 +65,15 @@ export function playWelcomeFlight({ dialog, home, portal, tunnel, target, starte
       darken();
     }
 
+    // A fixed exposure gives the same trails at a given camera pose on every refresh rate.
+    const exposureStart = time - .095;
     tunnel?.draw({
       x, y, rx, ry,
       progress: clamp((time - .51) / (flightDuration - .51)),
       opacity: ease(.39, .94, time) * (1 - ease(2.91, flightDuration, time)),
+      zoom,
+      trailingZoom: cameraZoom(approachAt(exposureStart), arrivalAt(exposureStart)),
+      pointsOpacity: ease(.7, 1.25, time) * (1 - ease(3.02, flightDuration, time)),
     });
 
     if (time >= flightDuration) finish();

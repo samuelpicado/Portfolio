@@ -1,5 +1,16 @@
 const turn = 2 * Math.PI;
 const black = '#010101';
+const lavender = '#bbabd8';
+const points = Array.from({ length: 16 }, (_, index) => {
+  const angle = index * 2.39996 + .25;
+  const radius = .29 + .15 * (index * 7 % 16) / 15;
+  return {
+    x: Math.cos(angle) * radius,
+    y: Math.sin(angle) * radius,
+    depth: 1.26 + .62 * (index * 11 % 16) / 15,
+    size: 1.4 + .65 * (index * 3 % 16) / 15,
+  };
+});
 
 export function mountWelcomeTunnel(canvas) {
   const context = canvas.getContext('2d');
@@ -20,10 +31,7 @@ export function mountWelcomeTunnel(canvas) {
     if (width && height) context.setTransform(pixelWidth / width, 0, 0, pixelHeight / height, 0, 0);
   }
 
-  function draw({ x, y, rx, ry, progress, opacity = 1 }) {
-    context.clearRect(0, 0, width, height);
-    if (!opacity || rx <= 0 || ry <= 0 || !width || !height) return;
-
+  function drawRim(x, y, rx, ry, progress, opacity) {
     const radius = Math.min(rx, ry);
     const feather = Math.min(.26, Math.max(5, Math.min(26, radius * .13)) / radius);
     // Finish the feather before the welcome layer's mask begins to turn opaque.
@@ -50,6 +58,60 @@ export function mountWelcomeTunnel(canvas) {
     context.arc(0, 0, mouth, 0, turn);
     context.fill();
     context.restore();
+  }
+
+  function drawPoints(x, y, rx, ry, zoom, trailingZoom, opacity) {
+    const narrow = width < 520;
+    const count = narrow ? 11 : points.length;
+    const trailLimit = narrow ? 25 : 36;
+    context.save();
+    context.lineCap = 'round';
+    context.fillStyle = lavender;
+
+    for (let index = 0; index < count; index++) {
+      const point = points[index];
+      const depth = point.depth - .68 * zoom;
+      const trailingDepth = point.depth - .68 * trailingZoom;
+      const offsetX = point.x * width / depth;
+      const offsetY = point.y * height / depth;
+      const headX = x + offsetX;
+      const headY = y + offsetY;
+      const trailScale = 1 - depth / trailingDepth;
+      const trailX = offsetX * trailScale;
+      const trailY = offsetY * trailScale;
+      const length = Math.hypot(trailX, trailY);
+      const size = Math.min(2.5, point.size / depth);
+      const wall = Math.max(0, Math.min(1, (Math.hypot(offsetX / rx, offsetY / ry) - .78) / .32));
+      context.globalAlpha = opacity * (.29 + .27 * wall);
+
+      if (length > size) {
+        const limit = Math.min(1, trailLimit / length);
+        const tailX = headX - trailX * limit;
+        const tailY = headY - trailY * limit;
+        const glow = context.createLinearGradient(tailX, tailY, headX, headY);
+        glow.addColorStop(0, 'transparent');
+        glow.addColorStop(1, lavender);
+        context.strokeStyle = glow;
+        context.lineWidth = size;
+        context.beginPath();
+        context.moveTo(tailX, tailY);
+        context.lineTo(headX, headY);
+        context.stroke();
+      }
+
+      context.beginPath();
+      context.arc(headX, headY, size / 2, 0, turn);
+      context.fill();
+    }
+    context.restore();
+  }
+
+  function draw({ x, y, rx, ry, progress, opacity, zoom, trailingZoom, pointsOpacity }) {
+    context.clearRect(0, 0, width, height);
+    if (rx <= 0 || ry <= 0 || !width || !height) return;
+
+    if (opacity > 0) drawRim(x, y, rx, ry, progress, opacity);
+    if (pointsOpacity > 0) drawPoints(x, y, rx, ry, zoom, trailingZoom, pointsOpacity);
   }
 
   resize();
