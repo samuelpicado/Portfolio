@@ -19,11 +19,20 @@
   <link rel="stylesheet" href="opening.css">
   <link rel="stylesheet" href="navigation.css">
   <link rel="stylesheet" href="journey.css">
+  <link rel="stylesheet" href="welcome.css">
+  <script type="module" src="welcome.js"></script>
   <script type="module" src="portfolio.js"></script>
   <script type="module" src="signal.js"></script>
   <script type="module" src="navigation.js"></script>
 </head>
 <body>
+  <dialog id="portfolio-welcome" aria-labelledby="welcome-title">
+    <h1 id="welcome-title" class="visually-hidden" lang="en" tabindex="-1" autofocus>Welcome</h1>
+    <canvas class="welcome-light" aria-hidden="true"></canvas>
+    <button id="welcome-enter" type="button" aria-label="Entrar al portafolio">
+      <span class="welcome-word" aria-hidden="true">WELCOME</span>
+    </button>
+  </dialog>
   <a class="skip-link" href="#inicio">Saltar al contenido</a>
 
   <header class="site-header side-nav">

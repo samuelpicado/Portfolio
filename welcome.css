@@ -1,0 +1,61 @@
+#portfolio-welcome {
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100dvh;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: 0;
+  overflow: clip;
+  border: 0;
+  background: #010101;
+  color: #ede4d7;
+  color-scheme: dark;
+}
+
+#portfolio-welcome:not([open]) { display: none; }
+#portfolio-welcome::backdrop { background: transparent; }
+:root:has(#portfolio-welcome:modal) { overflow: hidden; }
+:root:has(#portfolio-welcome:modal) .opening-name span { animation-play-state: paused; }
+
+.welcome-light,
+#welcome-enter {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.welcome-light {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+#welcome-enter {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  touch-action: pinch-zoom;
+}
+
+#welcome-enter:focus-visible {
+  outline: 1px solid #e3c9aa;
+  outline-offset: -.5rem;
+}
+
+.welcome-word {
+  font-size: min(42dvh, 19vw);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+
+#portfolio-welcome[data-lit] .welcome-light { visibility: visible; }
+#portfolio-welcome[data-lit] .welcome-word { visibility: hidden; }
+
+@media (prefers-reduced-motion: no-preference) {
+  #portfolio-welcome[data-loading] .welcome-word { visibility: hidden; }
+}
