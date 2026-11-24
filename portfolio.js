@@ -322,7 +322,19 @@ function setupProjects() {
   }, { passive: true });
   if (hasScrollEnd) carousel.addEventListener('scrollend', () => trackCurrent(true));
   const clearPendingCard = () => { pendingCard = undefined; };
-  carousel.addEventListener('wheel', clearPendingCard, { passive: true });
+  carousel.addEventListener('wheel', event => {
+    if (!journeyIsActive() || carousel.contains(document.activeElement)) {
+      clearPendingCard();
+      return;
+    }
+    // An unfocused infinite reel has no edge for native scroll chaining.
+    // Leave the vertical wheel available to advance the page in that case.
+    if (!event.cancelable || event.ctrlKey || event.metaKey || event.shiftKey ||
+      Math.abs(event.deltaX) >= Math.abs(event.deltaY)) return;
+    event.preventDefault();
+    const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? window.innerHeight : 1;
+    window.scrollBy({ top: event.deltaY * unit, behavior: 'instant' });
+  }, { passive: false });
   carousel.addEventListener('pointerdown', clearPendingCard, { passive: true });
   window.addEventListener('resize', () => {
     fitTitle();

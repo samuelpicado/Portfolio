@@ -1,0 +1,102 @@
+.contact {
+  position: relative;
+  isolation: isolate;
+}
+
+#contact-stars {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  mask-image: linear-gradient(transparent, black 24%, black 85%, transparent);
+}
+
+.contact-grid {
+  width: min(calc(100% - 2 * max(3.25rem, var(--gutter))), 82rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+  align-items: center;
+  gap: clamp(1.5rem, 3.5vw, 4rem);
+}
+
+.contact h2 {
+  margin-block-end: clamp(1rem, 3vw, 2.5rem);
+  font-size: clamp(3.2rem, 7.7vw, 7.9rem);
+  font-weight: 740;
+  line-height: .92;
+  letter-spacing: -.052em;
+}
+
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .15rem 1.55rem;
+}
+
+.contact-links .email-row {
+  flex-basis: 100%;
+  gap: .12rem .65rem;
+  border: 0;
+}
+
+.contact-links .email-row a {
+  font-size: clamp(1.02rem, 1.55vw, 1.48rem);
+  letter-spacing: -.022em;
+}
+
+.contact-links > a {
+  border: 0;
+  color: var(--muted);
+  font: .8rem/1.4 var(--mono);
+}
+
+.contact-plate {
+  position: relative;
+  block-size: clamp(14rem, 47vw, 36rem);
+  max-block-size: 64svh;
+  background: radial-gradient(ellipse closest-side at 50% 50%,
+    color-mix(in srgb, var(--accent-wash) 68%, transparent), transparent);
+}
+
+#contact-field {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.site-footer { border-block-start: 0; }
+
+@media (max-width: 48rem) {
+  .contact-grid {
+    width: min(calc(100% - 2 * max(1.5rem, var(--gutter))), 36rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(.65rem, 1.8svh, 1.3rem);
+  }
+
+  .contact h2 { font-size: clamp(3.4rem, 13.3vw, 6.1rem); }
+  .contact-plate { block-size: min(63vw, 36svh, 21rem); }
+}
+
+@media (max-height: 33rem) {
+  .contact { padding-block-start: 2rem; }
+}
+
+@media (max-width: 48rem) and (max-height: 30rem) {
+  .contact h2 {
+    margin-block-end: .65rem;
+    font-size: clamp(3rem, 9vw, 3.8rem);
+  }
+  .contact-plate { max-block-size: 30svh; }
+}
+
+@media (orientation: landscape) and (max-height: 34rem) {
+  .contact-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr);
+    width: min(calc(100% - 2 * var(--gutter)), 82rem);
+  }
+  .contact-plate { block-size: 55svh; max-block-size: none; }
+}

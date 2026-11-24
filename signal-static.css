@@ -1,0 +1,46 @@
+.journey-canvas[data-static-circuit] {
+  position: relative;
+  isolation: isolate;
+}
+
+.static-wiring {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  stroke-width: 1.65px;
+  opacity: .82;
+  color: var(--accent);
+}
+
+.static-violet { color: light-dark(#624abe, #c0a7ff); }
+.static-coral { color: light-dark(#a84a43, #ff9e91); }
+.static-mint { color: light-dark(#27766d, #87ebcd); }
+.static-wiring path, .static-wiring circle { stroke-width: 1.2px; }
+.static-wiring .static-strand {
+  stroke-width: 1.65px;
+  filter: drop-shadow(0 0 3px currentColor);
+}
+.static-wiring circle { fill: var(--paper); }
+
+[data-static-circuit] .signal-hero > .shell { padding-block-start: 1.75rem; }
+
+@media (max-width: 48rem) {
+  [data-static-circuit] .project-index-list li { row-gap: .95rem; }
+}
+
+@media (forced-colors: active) {
+  .static-wiring { opacity: 1; }
+  .static-violet { color: CanvasText; }
+  .static-coral { color: LinkText; }
+  .static-mint { color: GrayText; }
+  .static-wiring circle { fill: Canvas; }
+  .static-wiring .static-strand { filter: none; }
+}

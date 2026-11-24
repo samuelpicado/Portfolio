@@ -1,0 +1,91 @@
+.signal-wiring {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.signal-current {
+  display: none;
+  position: absolute;
+  inset: 0 auto auto 0;
+  pointer-events: none;
+}
+
+.wire-violet { color: #624abe; color: light-dark(#624abe, #c0a7ff); }
+.wire-coral { color: #a84a43; color: light-dark(#a84a43, #ff9e91); }
+.wire-mint { color: #27766d; color: light-dark(#27766d, #87ebcd); }
+.wire-tap { stroke: currentColor; stroke-width: 1.15; }
+.wire-tap circle { fill: var(--paper); }
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-journey] :is(.signal-current, .signal-wiring) { display: block; }
+
+  /* A single surface spans the five rooms, including the insides of camera turns. */
+  [data-journey] .journey-canvas {
+    background-color: var(--field);
+    background-image:
+      linear-gradient(to top, var(--field), transparent 3%),
+      radial-gradient(ellipse 27% 24% at 39% 12%, light-dark(#e5dafa, #291d3d), transparent),
+      radial-gradient(ellipse 38% 35% at 88% 53%, var(--paper) 24%, transparent),
+      radial-gradient(ellipse 28% 24% at 33% 83%, light-dark(#e1e6ec, #212237), transparent);
+  }
+
+  .journey[data-journey] [data-journey-scene] {
+    position: relative;
+    z-index: 1;
+    background: transparent;
+  }
+
+  [data-journey] .signal-hero > .shell { padding-block-start: clamp(1.8rem, 4svh, 2.75rem); }
+  /* Transparent borders reserve a clear passage even while the scene's
+     content scrolls internally. The wires are drawn on the shared canvas. */
+  [data-journey] .project-index {
+    border-block: clamp(1.5rem, 3.5svh, 2.75rem) solid transparent;
+  }
+  [data-journey] .project-index-heading {
+    justify-content: flex-start;
+    column-gap: clamp(1rem, 2.3vw, 2.6rem);
+  }
+  [data-journey] .profile { border-block-end: clamp(1.5rem, calc(3.1vw + 11px), 4rem) solid transparent; }
+  [data-journey] .project-index-list li { column-gap: clamp(1.65rem, 3vw, 3rem); }
+}
+
+@media (max-width: 48rem) and (prefers-reduced-motion: no-preference) {
+  [data-journey] .project-index-list li { row-gap: .95rem; }
+}
+
+@media (max-width: 42rem) and (max-height: 36rem) and (prefers-reduced-motion: no-preference) {
+  [data-journey] .opening-plate { height: clamp(8rem, min(63vw, 100svh - 19rem), 24rem); }
+}
+
+/* In a short landscape viewport the field and its outlet must be visible in
+   the first scene, even before the visitor scrolls the opening map. */
+@media (min-width: 30rem) and (max-height: 36rem) and (min-aspect-ratio: 6/5) and (prefers-reduced-motion: no-preference) {
+  [data-journey] .opening-stage {
+    grid-template-rows: auto;
+    min-height: min(79svh, 24rem);
+    padding-block: clamp(.65rem, 3svh, 1.5rem);
+  }
+  [data-journey] .opening-name { font-size: clamp(2.8rem, min(10vw, 18svh), 6rem); }
+  [data-journey] .opening-role { margin-block-start: .65rem; font-size: clamp(.95rem, 2.2vw, 1.2rem); }
+  [data-journey] .opening-plate {
+    position: absolute;
+    inset: 0 0 0 auto;
+    width: 55%;
+    height: 100%;
+    margin: 0;
+  }
+}
+
+@media (forced-colors: active) {
+  .signal-wiring { forced-color-adjust: none; }
+  .wire-violet { color: LinkText; }
+  .wire-coral { color: VisitedText; }
+  .wire-mint { color: CanvasText; }
+}

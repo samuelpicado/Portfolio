@@ -1,5 +1,4 @@
-const clampProgress = value => Math.max(0, Math.min(1, value));
-const interpolate = (start, end, fraction) => start + (end - start) * fraction;
+import { clamp as clampProgress, mix as interpolate, smoothPhase } from './signal-motion.js';
 
 export function buildJourneyPath(width, height) {
   const stops = [[0, 0], [0, height], [width, height], [width, 2 * height], [0, 2 * height]];
@@ -22,20 +21,22 @@ export function buildJourneyPath(width, height) {
 
     const [beforeX, beforeY] = stops[index - 1];
     const [nextX, nextY] = stops[index + 1];
-    const trim = .13 * Math.min(width, height);
+    const trim = .17 * Math.min(width, height);
     const incoming = trim / Math.hypot(beforeX - x, beforeY - y);
     const outgoing = trim / Math.hypot(nextX - x, nextY - y);
     const entryX = interpolate(x, beforeX, incoming);
     const entryY = interpolate(y, beforeY, incoming);
     const exitX = interpolate(x, nextX, outgoing);
     const exitY = interpolate(y, nextY, outgoing);
-    stopIndices.push(points.length + 2);
+    stopIndices.push(points.length + 12);
 
-    for (let step = 0; step <= 4; step++) {
-      const t = step / 4;
+    for (let step = 0; step <= 24; step++) {
+      const t = step / 24;
+      const turn = t ** 3 * (2 - t);
+      const approach = 2 * t - turn;
       addPoint(
-        interpolate(interpolate(entryX, x, t), interpolate(x, exitX, t), t),
-        interpolate(interpolate(entryY, y, t), interpolate(y, exitY, t), t),
+        interpolate(entryX, x, approach) + (exitX - x) * turn,
+        interpolate(entryY, y, approach) + (exitY - y) * turn,
       );
     }
   });
@@ -57,6 +58,21 @@ export function buildJourneyPath(width, height) {
 }
 
 let activeJourney;
+let journeyFrame = null;
+const frameEvents = new EventTarget();
+
+// A null frame means the sections are in normal document flow.
+export function subscribeJourneyFrame(callback) {
+  const notify = () => callback(journeyFrame);
+  frameEvents.addEventListener('change', notify);
+  notify();
+  return () => frameEvents.removeEventListener('change', notify);
+}
+
+function publishFrame(frame) {
+  journeyFrame = frame;
+  frameEvents.dispatchEvent(new Event('change'));
+}
 
 export function supportsReelLayout() {
   return CSS.supports('height', '100svh') && CSS.supports('selector(:has(*))');
@@ -81,7 +97,6 @@ function mountJourney(runway, viewport, canvas, scenes) {
   let visible = true;
   let destination;
   let sceneIndex = 0;
-  let pose = '';
 
   const sceneFor = target => target === runway ? 0 : scenes.indexOf(target?.closest('[data-journey-scene]'));
   const hashTarget = hash => document.getElementById(hash.slice(1));
@@ -90,21 +105,21 @@ function mountJourney(runway, viewport, canvas, scenes) {
   function render() {
     let [x, y] = path.at(displayed);
     // A direct link lands square on the scene even where the scroll path cuts a corner.
-    if (destination && Math.abs(scrollY - destination.top) < 2) {
+    if (destination) {
       const stop = path.checkpoints[destination.index];
-      const blend = clampProgress(1 - Math.abs(displayed - stop) / .02);
+      const distance = Math.abs(displayed - stop);
+      const blend = 1 - smoothPhase(.001, .046, distance);
       const [stopX, stopY] = path.stops[destination.index];
       x = interpolate(x, stopX, blend);
       y = interpolate(y, stopY, blend);
-      destination.arrived = true;
-    } else if (destination?.arrived) {
-      destination = undefined;
+      if (Math.abs(scrollY - destination.top) < 2) destination.arrived = true;
+      else if (destination.arrived && !blend) destination = undefined;
     }
 
-    const transform = `translate3d(${-x}px, ${-y}px, 0)`;
-    if (transform !== pose) {
-      canvas.style.transform = transform;
-      pose = transform;
+    const moved = x !== journeyFrame?.x || y !== journeyFrame?.y;
+    if (moved) canvas.style.transform = `translate3d(${-x}px, ${-y}px, 0)`;
+    if (moved || path.stops !== journeyFrame?.stops || displayed !== journeyFrame?.progress) {
+      publishFrame({ progress: displayed, x, y, width, height, stops: path.stops, checkpoints: path.checkpoints });
     }
 
     const next = path.checkpoints.findIndex((checkpoint, index) => index > 0 &&
@@ -242,6 +257,7 @@ function mountJourney(runway, viewport, canvas, scenes) {
       runway.removeAttribute('data-journey');
       delete runway.dataset.journeyCurrent;
       canvas.style.removeProperty('transform');
+      publishFrame(null);
       return scenes[sceneIndex];
     },
   };

@@ -1,3 +1,5 @@
+import { clamp, cubic, mix, smoothPhase } from './signal-motion.js';
+
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const systemDark = matchMedia('(prefers-color-scheme: dark)');
 const root = document.documentElement;
@@ -17,8 +19,7 @@ function fitCanvas(canvas, context, width, height) {
   context.setTransform(ratio, 0, 0, ratio, 0, 0);
 }
 
-function setupOpeningPoints() {
-  const canvas = document.querySelector('#opening-points');
+function setupOpeningPoints(canvas, stars = false) {
   const context = canvas?.getContext('2d');
   if (!context || typeof ResizeObserver !== 'function' || typeof IntersectionObserver !== 'function') return;
 
@@ -61,14 +62,14 @@ function setupOpeningPoints() {
     if (!width || !height) return;
     if (!bounds || bounds.width !== width || bounds.height !== height) {
       fitCanvas(canvas, context, width, height);
-      const spacing = width < 520 ? 24 : 30;
+      const spacing = stars ? 34 : width < 520 ? 24 : 30;
       points = [];
       for (let row = 0; row * spacing < height; row++) {
         for (let column = 0; column * spacing < width; column++) {
           const phase = row * 2.39996 + column * 1.618;
           points.push({
-            x: (column + .5) * spacing + Math.sin(phase * 2.1) * 5,
-            y: (row + .5) * spacing + Math.cos(phase * 1.9) * 5,
+            x: (column + .5) * spacing + Math.sin(phase * 2.1) * (stars ? 16 : 5),
+            y: (row + .5) * spacing + Math.cos(phase * 1.9) * (stars ? 16 : 5),
             phase,
             size: 1.4 + (1 + Math.cos(phase * 3)) * .35,
             offsetX: 0,
@@ -103,7 +104,25 @@ function setupOpeningPoints() {
       }
       point.offsetX = moving ? point.offsetX * .76 + dx * push * .24 : 0;
       point.offsetY = moving ? point.offsetY * .76 + dy * push * .24 : 0;
-      context.fillRect(x + point.offsetX, y + point.offsetY, point.size, point.size);
+      const px = x + point.offsetX, py = y + point.offsetY;
+      if (stars) {
+        const shine = .58 + .37 * Math.cos(point.phase * 4 + (moving ? time * 1.4 : 0));
+        const prominent = Math.sin(point.phase * 12.78) > .98;
+        const size = point.size * (prominent ? 1.4 : .63);
+        context.globalAlpha = (dark ? .82 : .57) * shine;
+        context.fillStyle = Math.cos(point.phase) > .6 ? (dark ? '#9bf9dd' : '#397b74') : (dark ? '#d6c8ff' : '#7650a8');
+        context.beginPath();
+        context.moveTo(px, py - size);
+        context.lineTo(px + size * .64, py);
+        context.lineTo(px, py + size);
+        context.lineTo(px - size * .64, py);
+        context.fill();
+        if (prominent) {
+          context.globalAlpha *= .42;
+          context.fillRect(px - size * 1.9, py - .3, size * 3.8, .6);
+          context.fillRect(px - .3, py - size * 1.9, .6, size * 3.8);
+        }
+      } else context.fillRect(px, py, point.size, point.size);
     }
     if (!hero.hasAttribute('data-points')) hero.dataset.points = '';
     if (moving) schedulePaint();
@@ -167,108 +186,173 @@ function setupNameJelly() {
   });
 }
 
-function setupSignalField() {
-  const canvas = document.querySelector('#signal-field');
+const branchRings = [13, 23, 33];
+
+const fieldSteps = 120;
+const contours = Array.from({ length: 34 }, (_, ring) => {
+  const radius = .075 + ring * .0255;
+  const color = ring < 14 ? 0 : ring < 24 ? 1 : 2;
+  const points = Array.from({ length: fieldSteps }, (_, i) => {
+    const angle = i * 2 * Math.PI / fieldSteps;
+    const warp = 1 + .18 * Math.cos(angle * 3 + radius * 2.5) + .10 * Math.sin(angle * 2 - radius * 6);
+    const x = Math.cos(angle) * radius * warp * .53;
+    const y = Math.sin(angle) * radius * warp * .32;
+    return [x * .95 - y * .4 + .15 * radius - .04, x * -.32 + y * .94 + .045 - radius * .12];
+  });
+  return { radius, color, points, isBranch: branchRings[color] === ring };
+});
+const fieldPoints = contours.flatMap(({ points }) => points);
+const extent = fieldPoints.reduce(({ left, top, right, bottom }, [x, y]) => ({
+  left: Math.min(left, x), top: Math.min(top, y),
+  right: Math.max(right, x), bottom: Math.max(bottom, y),
+}), { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
+
+export function signalPorts(kind, width, height) {
+  const spread = Math.min(7, width * .013, height * .019);
+  return branchRings.map((_, index) => kind === 'contact'
+    ? [width, height * .72 + (index - 1) * spread]
+    : [width * .86 + (index - 1) * spread, height]);
+}
+
+// Sample each open strand once per size. A vertical/horizontal final tangent
+// lets the line continue across the canvas boundary into the page-wide route.
+function strandPoints(contact, width, height, [endX, endY], color) {
+  const startX = width * (contact ? .30 : .47) + (color - 1) * 3;
+  const startY = height * (contact ? .34 : .27) + (color - 1) * 3;
+  const bendX = contact ? width * .58 : width * .65;
+  const bendY = contact ? height * .33 : height * .32;
+  const exitX = contact ? endX - width * .21 : endX;
+  const exitY = contact ? endY : endY - height * .38;
+  return Array.from({ length: fieldSteps + 1 }, (_, step) => {
+    const u = step / fieldSteps;
+    return [
+      cubic(startX, bendX, exitX, endX, u),
+      cubic(startY, bendY, exitY, endY, u),
+    ];
+  });
+}
+
+function setupSignalField(canvas, kind) {
   const context = canvas?.getContext('2d');
   if (!context) return;
 
+  const contact = kind === 'contact';
   const plate = canvas.parentElement;
-  const hero = plate.closest('.signal-hero');
-  const map = hero.querySelector('.opening-map');
-  const routes = [
-    { ring: 13, vertex: 110, end: [.93, .13] },
-    { ring: 23, vertex: 9, end: [.95, .47] },
-    { ring: 33, vertex: 22, end: [.89, .81] },
-  ];
-  const angles = Array.from({ length: 121 }, (_, i) => i * Math.PI / 60);
-  const contours = Array.from({ length: 34 }, (_, ring) => {
-    const t = .075 + ring * .0255;
-    const color = ring < 14 ? 0 : ring < 24 ? 1 : 2;
-    const points = angles.map(angle => {
-      const warp = 1 + .18 * Math.cos(angle * 3 + t * 2.5) + .10 * Math.sin(angle * 2 - t * 6);
-      const x = Math.cos(angle) * t * warp * .53;
-      const y = Math.sin(angle) * t * warp * .32;
-      return [x * .95 - y * .4 + .15 * t - .04, x * -.32 + y * .94 + .045 - t * .12];
-    });
-    return { t, color, points, routeVertex: ring === routes[color].ring ? routes[color].vertex : -1 };
-  });
-  const rightmost = Math.max(...contours[contours.length - 1].points.map(([x]) => x));
+  const section = plate.closest('[data-journey-scene]');
+  const map = section?.querySelector('.opening-map');
+  const seam = contact ? 7 : 24;
   let pointer;
+  let cursor;
+  let cursorStrength = 0;
+  let cursorTime = 0;
   let hovered = -1;
   let focused = -1;
   let frame = 0;
+  let unfold = 0;
+  let feed = 1;
+  let movingJourney = false;
+  let size;
+  let ports;
+  let strands;
 
   function paint() {
     frame = 0;
-    const bounds = plate.getBoundingClientRect();
+    movingJourney = Boolean(section?.closest('[data-journey]'));
+    const bounds = canvas.getBoundingClientRect();
     const { width, height } = bounds;
     if (!width || !height) return;
+    if (!size || size.width !== width || size.height !== height) {
+      size = { width, height };
+      ports = signalPorts(kind, width, height);
+      strands = ports.map((port, index) => strandPoints(contact, width, height, port, index));
+    }
     fitCanvas(canvas, context, width, height);
     context.clearRect(0, 0, width, height);
+    if (!plate.hasAttribute('data-drawn')) plate.dataset.drawn = '';
 
     const dark = darkTheme();
     const colors = dark ? ['#c0a7ff', '#ff9e91', '#87ebcd'] : ['#624abe', '#a84a43', '#27766d'];
-    const cursor = pointer && !reducedMotion.matches
-      ? [pointer.x - bounds.left, pointer.y - bounds.top] : null;
-    const scale = Math.min(width, height * 1.35);
-    const shift = cursor && cursor[0] > 0 && cursor[0] < width && cursor[1] > 0 && cursor[1] < height;
-    const responsive = Math.max(-1, Math.min(1, shift ? (cursor[0] / width - .55) * 2 : 0));
+    const still = reducedMotion.matches;
+    const amount = still ? 0 : unfold;
+    context.lineCap = 'round';
+    context.lineJoin = 'round';
+    const leading = contact && !still && feed < 1;
+    if (leading && feed === 0) return;
+
+    const ease = smoothPhase(0, 1, amount);
+    // At Contact keep the incoming tip joined until the outer wake has faded.
+    const outlet = contact ? smoothPhase(.02, .34, amount) : smoothPhase(.08, .64, amount);
+    // Fit the complete contour, including space for the pointer displacement.
+    const air = Math.max(14, Math.min(29, width * .05, height * .085));
+    const scale = contact ? Math.min(
+      (width - air * 2) / (extent.right - extent.left),
+      (height - air * 2) / (extent.bottom - extent.top),
+    ) : Math.min(width, height * 1.35);
+    const midX = contact ? width / 2 - (extent.right + extent.left) * scale / 2 : width * .52;
+    const midY = contact ? height / 2 - (extent.top + extent.bottom) * scale / 2 : height * .50;
+    const scaleX = contact ? scale : Math.max(scale, (width * 1.04 - midX) / extent.right);
     const active = focused < 0 ? hovered : focused;
-    const midX = width * .52;
-    const midY = height * .50;
-    const scaleX = Math.max(scale, (width * 1.04 - midX) / rightmost);
-    const anchors = [];
-    context.lineWidth = Math.min(1.35, .85 + width / 2000);
-    for (const { t, color, points, routeVertex } of contours) {
+    const tracking = !still && Boolean(pointer);
+    const now = performance.now();
+    const easePointer = 1 - Math.exp(-Math.max(1, cursorTime ? now - cursorTime : 16) / 53);
+    cursorTime = now;
+    if (tracking) {
+      cursor ??= { ...pointer };
+      cursor.x = mix(cursor.x, pointer.x, easePointer);
+      cursor.y = mix(cursor.y, pointer.y, easePointer);
+    }
+    cursorStrength = still ? 0 : mix(cursorStrength, tracking ? 1 : 0, easePointer);
+    if (!tracking && cursorStrength <= .007) {
+      cursorStrength = 0;
+      cursor = undefined;
+    }
+    const px = (cursor?.x ?? 0) - bounds.left, py = (cursor?.y ?? 0) - bounds.top;
+    const reach = Math.max(66, Math.min(176, width * .29));
+    const responsive = (contact ? 1.1 : .6) * cursorStrength * (1 - ease);
+
+    for (const { radius, color, points, isBranch } of contours) {
+      const emphasis = active < 0 || active === color ? 1 : .43;
+      const peel = ease + .62 * ease * (1 - ease) * Math.cos(radius * 7);
+      const alpha = (dark ? .58 : .54) * emphasis * (isBranch ? 1 : 1 - peel * .64);
       context.strokeStyle = colors[color];
-      context.globalAlpha = (dark ? .52 : .56) * (active < 0 || active === color ? 1 : .43);
+      context.globalAlpha = alpha + (isBranch ? ease * .14 : 0);
+      context.lineWidth = Math.min(1.35, .85 + width / 2000) * (isBranch ? 1.18 : 1 - peel * .42);
       context.beginPath();
-      for (const [index, [baseX, baseY]] of points.entries()) {
-        let x = midX + baseX * scaleX;
-        let y = midY + baseY * scale;
-        if (shift) {
-          const dx = x - cursor[0];
-          const dy = y - cursor[1];
-          const attract = Math.exp(-(dx * dx + dy * dy) / (scale * scale * .027));
-          x += dx * attract * -.36 + responsive * t * 7;
-          y += dy * attract * -.36;
+      const start = leading ? (1 - feed) * fieldSteps : 0;
+      for (let step = start; ; step = Math.min(fieldSteps, Math.floor(step) + 1)) {
+        const i = Math.floor(step);
+        const fraction = step - i;
+        const a = points[(i + seam) % fieldSteps];
+        const b = points[(i + seam + 1) % fieldSteps];
+        let x = midX + mix(a[0], b[0], fraction) * scaleX;
+        let y = midY + mix(a[1], b[1], fraction) * scale;
+        const dx = px - x, dy = py - y;
+        const force = responsive * Math.exp(-(dx * dx + dy * dy) / (reach * reach));
+        x += (dx * .43 - dy * .22) * force;
+        y += (dy * .43 + dx * .22) * force;
+
+        if (amount) {
+          // Release the seam first and pull the rest of each contour behind it.
+          // The moving contour itself reaches the outlet, with no extra lead.
+          const u = step / fieldSteps;
+          const tip = smoothPhase(.54, 1, u);
+          const blend = mix(peel, outlet, tip);
+          const strand = strands[color];
+          const next = strand[Math.min(i + 1, fieldSteps)];
+          const spread = (radius * 42 - 10) * (1 - u) * (1 + .53 * Math.sin(u * 7 + radius * 7));
+          x = mix(x, mix(strand[i][0], next[0], fraction) + (contact ? 0 : spread), blend);
+          y = mix(y, mix(strand[i][1], next[1], fraction) + (contact ? spread : 0), blend);
         }
-        if (index === routeVertex) anchors[color] = [x, y];
-        if (index === 0) context.moveTo(x, y);
+        if (step === start) context.moveTo(x, y);
         else context.lineTo(x, y);
+        if (step === fieldSteps) break;
       }
-      context.closePath();
+      if (!amount) context.closePath();
       context.stroke();
     }
-
-    routes.forEach(({ end }, index) => {
-      const [startX, startY] = anchors[index];
-      const [x, y] = [end[0] * width, end[1] * height];
-      const isActive = index === active;
-      const bend = x - Math.min(55, width * .12);
-      context.globalAlpha = isActive ? 1 : dark ? .66 : .59;
-      context.strokeStyle = colors[index];
-      context.fillStyle = colors[index];
-      context.lineWidth = isActive ? 2.05 : 1;
-      context.beginPath();
-      context.moveTo(startX, startY);
-      context.lineTo(Math.max(startX, bend - Math.abs(y - startY)), startY);
-      context.lineTo(bend, y);
-      context.lineTo(x, y);
-      context.stroke();
-      context.fillRect(startX - 1.75, startY - 1.75, 3.5, 3.5);
-
-      context.save();
-      context.translate(x, y);
-      context.rotate(Math.PI / 4);
-      context.fillRect(-3.2, -3.2, 6.4, 6.4);
-      context.globalAlpha *= .5;
-      const outline = isActive ? 6.6 : 5.4;
-      context.strokeRect(-outline, -outline, outline * 2, outline * 2);
-      context.restore();
-    });
+    if (!still && (Math.abs(cursorStrength - Number(tracking)) > .007 ||
+      (tracking && Math.hypot(cursor.x - pointer.x, cursor.y - pointer.y) > .5))) schedulePaint();
     context.globalAlpha = 1;
-    plate.dataset.drawn = '';
   }
 
   const schedulePaint = () => { if (!frame) frame = requestAnimationFrame(paint); };
@@ -277,29 +361,45 @@ function setupSignalField() {
     return route ? Number(route.dataset.signalRoute) : -1;
   };
 
-  hero.addEventListener('pointermove', (event) => {
+  const pointerSurface = contact ? plate : section;
+  pointerSurface?.addEventListener('pointermove', (event) => {
     if (event.pointerType === 'touch' || reducedMotion.matches) return;
+    if (!pointer) cursorTime = performance.now() - 16;
     pointer = { x: event.clientX, y: event.clientY };
     schedulePaint();
   }, { passive: true });
-  hero.addEventListener('pointerleave', () => {
+  pointerSurface?.addEventListener('pointerleave', () => {
     pointer = undefined;
+    cursorTime = performance.now();
     hovered = -1;
     schedulePaint();
   });
-  map.addEventListener('pointerover', (event) => {
+  map?.addEventListener('pointerover', (event) => {
     if (event.pointerType === 'touch') return;
     hovered = branchFor(event.target);
     schedulePaint();
   });
-  map.addEventListener('pointerleave', () => { hovered = -1; schedulePaint(); });
-  map.addEventListener('focusin', (event) => { focused = branchFor(event.target); schedulePaint(); });
-  map.addEventListener('focusout', (event) => { focused = branchFor(event.relatedTarget); schedulePaint(); });
+  map?.addEventListener('pointerleave', () => { hovered = -1; schedulePaint(); });
+  map?.addEventListener('focusin', (event) => { focused = branchFor(event.target); schedulePaint(); });
+  map?.addEventListener('focusout', (event) => { focused = branchFor(event.relatedTarget); schedulePaint(); });
   if (typeof ResizeObserver === 'function') new ResizeObserver(schedulePaint).observe(plate);
   new MutationObserver(schedulePaint).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
   systemDark.addEventListener('change', schedulePaint);
   reducedMotion.addEventListener('change', schedulePaint);
   schedulePaint();
+
+  return (value, strandFeed = 1) => {
+    const next = clamp(value);
+    const nextFeed = clamp(strandFeed);
+    if (unfold === next && feed === nextFeed &&
+      movingJourney === Boolean(section?.closest('[data-journey]'))) return;
+    unfold = next;
+    feed = nextFeed;
+    // The camera already runs in an animation frame. Paint in that same
+    // frame so the joints never trail the route when the user scrolls fast.
+    cancelAnimationFrame(frame);
+    paint();
+  };
 }
 
 function setupCursorSignal() {
@@ -392,7 +492,15 @@ function setupCursorSignal() {
   });
 }
 
-setupOpeningPoints();
+setupOpeningPoints(document.querySelector('#opening-points'));
+setupOpeningPoints(document.querySelector('#contact-stars'), true);
 setupNameJelly();
-setupSignalField();
+const unfoldOpening = setupSignalField(document.querySelector('#signal-field'), 'opening');
+const unfoldContact = setupSignalField(document.querySelector('#contact-field'), 'contact');
+
+export function setSignalUnfold(opening, contact, feed = 1) {
+  unfoldOpening?.(opening);
+  unfoldContact?.(contact, feed);
+}
+
 setupCursorSignal();

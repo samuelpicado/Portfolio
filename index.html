@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Portfolio de Samuel Alonso Picado Marín. Desarrollo web y de escritorio, APIs y bases de datos. Ingeniería en Sistemas de Información en la Universidad Nacional de Costa Rica.">
   <title>Samuel Picado · Desarrollo web y de escritorio</title>
-  <link rel="icon" href="assets/mark.png" type="image/png">
+  <link rel="icon" href="favicon.ico" type="image/x-icon" sizes="16x16 32x32 48x48">
   <link rel="preload" href="assets/bricolage.woff2" as="font" type="font/woff2" crossorigin>
   <script>
     try {
@@ -19,10 +19,14 @@
   <link rel="stylesheet" href="opening.css">
   <link rel="stylesheet" href="navigation.css">
   <link rel="stylesheet" href="journey.css">
+  <link rel="stylesheet" href="contact-field.css">
+  <link rel="stylesheet" href="signal-journey.css">
+  <link rel="stylesheet" href="signal-static.css">
   <link rel="stylesheet" href="welcome.css">
   <script type="module" src="welcome.js"></script>
   <script type="module" src="portfolio.js"></script>
   <script type="module" src="signal.js"></script>
+  <script type="module" src="signal-journey.js"></script>
   <script type="module" src="navigation.js"></script>
 </head>
 <body>
@@ -143,7 +147,7 @@
                   <div class="reel-progress" aria-hidden="true"></div>
                   <span id="project-position" aria-hidden="true">01 / 05</span>
                   <a class="reel-exit" href="#mas-proyectos">Más proyectos <span aria-hidden="true">↘</span></a>
-                  <p class="visually-hidden" id="reel-instructions">Desplázate o usa las flechas del teclado para recorrer los casos en ambas direcciones.</p>
+                  <p class="visually-hidden" id="reel-instructions">Con el carrusel enfocado, usa la rueda o las flechas del teclado para recorrer los casos. Pulsa Tab para salir del carrusel.</p>
                   <span id="project-status" class="visually-hidden" role="status"></span>
                 </div>
               </div>
@@ -361,19 +365,23 @@
         </section>
 
         <section class="contact" id="contacto" data-journey-scene tabindex="-1" aria-labelledby="contact-title">
+          <canvas id="contact-stars" aria-hidden="true"></canvas>
           <div class="shell contact-grid">
-            <div>
+            <div class="contact-copy">
               <h2 id="contact-title">Hablemos<span>.</span></h2>
-            </div>
-            <div class="contact-links">
-              <div class="email-row">
-                <a href="mailto:samipikdo@gmail.com">samipikdo@gmail.com <span class="arrow-diagonal" aria-hidden="true"></span></a>
-                <button id="copy-email" type="button" hidden>Copiar</button>
-                <p id="copy-status" class="visually-hidden" role="status"></p>
+              <div class="contact-links">
+                <div class="email-row">
+                  <a href="mailto:samipikdo@gmail.com">samipikdo@gmail.com <span class="arrow-diagonal" aria-hidden="true"></span></a>
+                  <button id="copy-email" type="button" hidden>Copiar</button>
+                  <p id="copy-status" class="visually-hidden" role="status"></p>
+                </div>
+                <a href="https://www.linkedin.com/in/samuel-picado-8082373b4">LinkedIn <span class="arrow-diagonal" aria-hidden="true"></span></a>
+                <a href="https://github.com/samuelpicado">GitHub <span class="arrow-diagonal" aria-hidden="true"></span></a>
               </div>
-              <a href="https://www.linkedin.com/in/samuel-picado-8082373b4">LinkedIn <span class="arrow-diagonal" aria-hidden="true"></span></a>
-              <a href="https://github.com/samuelpicado">GitHub <span class="arrow-diagonal" aria-hidden="true"></span></a>
             </div>
+            <figure class="contact-plate" aria-hidden="true">
+              <canvas id="contact-field"></canvas>
+            </figure>
           </div>
         </section>
       </div>
